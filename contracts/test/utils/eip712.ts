@@ -1,5 +1,6 @@
-import {Provider} from '@ethersproject/abstract-provider';
-import {SignerWithAddress} from '@nomiclabs/hardhat-ethers/dist/src/signers';
+import ethers from 'ethers';
+
+import {SignerWithAddress} from '@nomiclabs/hardhat-ethers/signers';
 import {BigNumberish, Contract, TypedDataDomain, TypedDataField} from 'ethers';
 import {Interface} from 'ethers/lib/utils';
 
@@ -42,7 +43,7 @@ export class EIP712SignerFactory {
 	constructor(private types: Record<string, Array<TypedDataField>>) {}
 
 	async createSignerFactory(
-		contractAddressOrDomain: {address: string; provider: Provider} | Contract | TypedDataDomain
+		contractAddressOrDomain: {address: string; provider: ethers.providers.Provider} | Contract | TypedDataDomain
 	): Promise<EIP712UserSignerFactory> {
 		const types = this.types;
 

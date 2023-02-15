@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: AGPL-1.0
-pragma solidity 0.8.13;
+pragma solidity 0.8.17;
 
 import "solidity-kit/src/ERC20/implementations/ERC20Base.sol";
 import "solidity-kit/src/ERC20/ERC2612/implementations/UsingPermitWithDynamicChainId.sol";

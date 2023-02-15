@@ -1,4 +1,4 @@
-import {TransactionResponse} from '@ethersproject/abstract-provider';
+import {providers} from 'ethers';
 import {ContractReceipt} from 'ethers';
 import {ethers} from 'hardhat';
 
@@ -15,7 +15,6 @@ export async function setTimestamp(newTimestamp: number) {
 	await ethers.provider.send('evm_setNextBlockTimestamp', [newTimestamp]);
 }
 
-
-export function waitForTx(tx: Promise<TransactionResponse>): Promise<ContractReceipt> {
+export function waitForTx(tx: Promise<providers.TransactionResponse>): Promise<ContractReceipt> {
 	return tx.then((v) => v.wait());
 }
