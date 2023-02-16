@@ -1,0 +1,21 @@
+{
+	"folders": [
+		{
+			"name": "contracts",
+			"path": "../contracts"
+		},
+		{
+			"name": "indexer",
+			"path": "../indexer"
+		},
+		{
+			"name": "web",
+			"path": "../web"
+		}
+		// {
+		// 	"name": "ROOT",
+		// 	"path": "../"
+		// }
+	],
+	"settings": {}
+}

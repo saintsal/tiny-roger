@@ -9,7 +9,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 	await deploy('Dummy', {
 		from: deployer,
 		log: true,
-		autoMine: true
+		autoMine: true,
 	});
 
 	return !useProxy; // when live network, record the script as executed to prevent rexecution

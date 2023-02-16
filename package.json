@@ -2,11 +2,6 @@
   "name": "tiny-roger",
   "version": "0.1.0",
   "description": "tiny-roger",
-  "pnpm": {
-    "patchedDependencies": {
-      "chai-ethers@0.0.1": "patches/chai-ethers@0.0.1.patch"
-    }
-  },
   "devDependencies": {
     "dotenv-extended": "^2.9.0",
     "syncpack": "^8.2.4"

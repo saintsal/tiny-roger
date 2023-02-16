@@ -2,12 +2,11 @@
 pragma solidity 0.8.17;
 
 contract Dummy {
+	event Hello(string value);
+	string value;
 
-  event Hello(string value);
-  string value;
-
-  function hello(string calldata v) external{
-    value = v;
-    emit Hello(v);
-  }
+	function hello(string calldata v) external {
+		value = v;
+		emit Hello(v);
+	}
 }
