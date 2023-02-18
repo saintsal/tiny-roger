@@ -1,4 +1,5 @@
 <script>
+	import Showcase from '$lib/components/website/Showcase.svelte';
 	import Feature from '../../lib/components/website/Feature.svelte';
 </script>
 
@@ -6,21 +7,23 @@
 	<div class="max-w-auto md:max-w-lg mx-auto">
 		<img
 			class="mb-8 mx-auto"
-			src="images/logo.svg"
+			src="/images/logo.svg"
 			alt="Jolly-Roger"
 			style="width:256px;height:256px;"
 			width="256px"
 			height="256px"
 		/>
-		<h2 class="text-6xl font-black mb-2 font-heading text-black dark:text-white">Jolly-Roger</h2>
-		<p class="m-6 text-gray-800 dark:text-gray-300 text-xl">
+		<h2 class="font-black mb-2 font-heading text-black dark:text-white !text-6xl">Jolly-Roger</h2>
+		<p class="m-6 text-gray-800 dark:text-gray-300 !text-xl">
 			Production-Ready Template To Build Decentralised Applications
 		</p>
-		<div class="max-w-md mx-auto pt-1 mt-5 space-y-3 md:mt-8 md:space-y-5">
+		<div class="max-w-md mx-auto pt-1 mt-5 space-y-3 md:m-8 md:space-y-5">
 			<div class="space-y-5 sm:flex sm:justify-center sm:space-y-0 sm:space-x-3">
-				<a class="big secondary" href="/demo/" aria-label="Try the Demo!">Demo</a>
+				<a class="btn variant-filled-primary" href="/demo/" aria-label="Try the Demo!">Demo</a>
 				<a
-					class="big secondary"
+					class="btn variant-filled-secondary"
+					target="_blank"
+					rel="noreferrer"
 					href="https://github.com/wighawag/jolly-roger"
 					aria-label="Check it out on github!"
 				>
@@ -29,8 +32,8 @@
 			</div>
 		</div>
 
-		<div class="pt-3 pb-4 dark:bg-black bg-white">
-			<h1 class="dark:text-gray-500 text-gray-500 m-4 font-semibold">Use it:</h1>
+		<div class="pt-3 pb-4 ">
+			<h1 class="m-4 font-semibold">Use it:</h1>
 			<code id="jolly-roger-command" class="mb-5 text-pink-600 font-black"
 				>npx degit wighawag/jolly-roger your-app-folder</code
 			>
@@ -58,134 +61,34 @@
 			</p>
 		</div>
 		<div class="mt-12 max-w-lg mx-auto grid gap-5 lg:grid-cols-3 lg:max-w-none">
-			<div
-				class="flex flex-col rounded-lg shadow-lg dark:shadow-slate-400 dark:shadow-sm overflow-hidden"
-			>
-				<div class="flex-shrink-0">
-					<a href="https://bleeps.art" target="_blank" rel="noreferrer"
-						><img
-							class="h-48 w-full object-cover"
-							src="https://bleeps.art/preview.png"
-							alt="bleeps.art"
-						/></a
-					>
-				</div>
-				<div class="flex-1 bg-white dark:bg-black p-6 flex flex-col justify-between">
-					<div class="flex-1">
-						<p class="text-xl font-medium text-pink-600">
-							<a href="https://bleeps.art" target="_blank" rel="noreferrer" class="underline">
-								bleeps.art
-							</a>
-						</p>
-						<div class="block mt-2">
-							<p class="text-xl font-semibold text-gray-900 dark:text-gray-100">
-								The Bleeps DAO and Its Fully Onchain Sounds
-							</p>
-							<p class="mt-3 text-base text-gray-700 dark:text-gray-300">
-								The First Composable Sounds Fully Generated On-Chain With Zero Externalities, no
-								backend, no ipfs, no client-code, and a melody minter where some of the proceeds
-								goes to the Bleeps DAO and its members
-							</p>
-							<p class="mt-3 text-base text-gray-500">
-								Source code available <a
-									href="https://github.com/wighawag/bleeps"
-									target="_blank"
-									rel="noreferrer"
-									class="underline">here</a
-								>
-							</p>
-						</div>
-					</div>
-				</div>
-			</div>
+			<Showcase
+				href="https://bleeps.art"
+				preview="https://bleeps.art/preview.png"
+				name="bleeps.art"
+				title="The Bleeps DAO and Its Fully Onchain Sounds"
+				description="The First Composable Sounds Fully Generated On-Chain With Zero Externalities, no backend, no ipfs, no client-code, and a melody minter where some of the proceeds goes to the Bleeps DAO and its members"
+				source="https://github.com/wighawag/bleeps"
+			/>
 
-			<div
-				class="flex flex-col rounded-lg shadow-lg dark:shadow-slate-400 dark:shadow-sm overflow-hidden"
-			>
-				<div class="flex-shrink-0">
-					<a href="https://mandalas.eth.limo" target="_blank" rel="noreferrer"
-						><img
-							class="h-48 w-full object-cover"
-							src="https://mandalas.eth.limo/preview.png"
-							alt="mandalas.eth"
-						/></a
-					>
-				</div>
-				<div class="flex-1 bg-white dark:bg-black p-6 flex flex-col justify-between">
-					<div class="flex-1">
-						<p class="text-xl font-medium text-pink-600">
-							<a
-								href="https://mandalas.eth.limo"
-								target="_blank"
-								rel="noreferrer"
-								class="underline"
-							>
-								mandalas.eth
-							</a>
-						</p>
-						<div class="block mt-2">
-							<p class="text-xl font-semibold text-gray-900 dark:text-gray-100">
-								On-chain Generative Bitmaps With Zero Externalities
-							</p>
-							<p class="mt-3 text-base text-gray-700 dark:text-gray-300">
-								The First On-Chain Generative Art Project to make full use of token URI to remove
-								all external dependencies. It generates SVG and Bitmap from the smart contract
-								directly.
-							</p>
-							<p class="mt-3 text-base text-gray-500">
-								Source code available <a
-									href="https://github.com/wighawag/mandalas"
-									target="_blank"
-									rel="noreferrer"
-									class="underline">here</a
-								>
-							</p>
-						</div>
-					</div>
-				</div>
-			</div>
+			<Showcase
+				href="https://mandalas.eth.limo"
+				preview="https://mandalas.eth.limo/preview.png"
+				name="mandalas.eth"
+				title="On-chain Generative Bitmaps With Zero Externalities"
+				description="The First On-Chain Generative Art Project to make full use of token URI to remove all external dependencies. It generates SVG and Bitmap from the smart contract directly."
+				source="https://github.com/wighawag/mandalas"
+			/>
 
-			<div
-				class="flex flex-col rounded-lg shadow-lg dark:shadow-slate-400 dark:shadow-sm overflow-hidden"
-			>
-				<div class="flex-shrink-0">
-					<a href="https://conquest.eth.limo" target="_blank" rel="noreferrer"
-						><img
-							class="h-48 w-full object-cover"
-							src="https://conquest.eth.limo/preview.png"
-							alt="conquest.eth"
-						/></a
-					>
-				</div>
-				<div class="flex-1 bg-white dark:bg-black p-6 flex flex-col justify-between">
-					<div class="flex-1">
-						<p class="text-xl font-medium text-pink-600">
-							<a
-								href="https://conquest.eth.limo"
-								target="_blank"
-								rel="noreferrer"
-								class="underline"
-							>
-								conquest.eth
-							</a>
-						</p>
-						<div class="block mt-2">
-							<p class="text-xl font-semibold text-gray-900 dark:text-gray-100">
-								A Game of Strategy and Diplomacy Running on the EVM
-							</p>
-							<p class="mt-3 text-base text-gray-700 dark:text-gray-300">
-								An unstoppable game of strategy and diplomacy running on the EVM. It allows player
-								to collaborate through on-chain alliances while remaining sovereign. A first of its
-								kind.
-							</p>
-							<p class="mt-3 text-base text-gray-500">Source code not yet available</p>
-						</div>
-					</div>
-				</div>
-			</div>
+			<Showcase
+				href="https://conquest.eth.limo"
+				preview="https://conquest.eth.limo/preview.png"
+				name="conquest.eth"
+				title="A Game of Strategy and Diplomacy Running on the EVM"
+				description="An unstoppable game of strategy and diplomacy running on the EVM. It allows player to collaborate through on-chain alliances while remaining sovereign. A first of its kind."
+			/>
 		</div>
 
-		<div class="pt-16 pb-4 dark:bg-black bg-white">
+		<div class="pt-16 pb-4">
 			<h2
 				class="text-3xl tracking-tight font-extrabold text-gray-900 dark:text-gray-100 sm:text-4xl"
 			>

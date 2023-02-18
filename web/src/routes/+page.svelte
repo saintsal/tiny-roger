@@ -7,5 +7,7 @@
 			>
 		</h1>
 		<p>A Production-Ready Template To Build Decentralised Applications</p>
+
+		<a href="/" class="btn variant-filled">Learn more</a>
 	</div>
 </div>
