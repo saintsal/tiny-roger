@@ -145,7 +145,7 @@
 					<Feature title="PWA ready: 100% Lighthouse score">
 						The web app is fully PWA compliant, with offline caching, etc... The javascript code
 						necessary to launch the app is less than 50kB (15kB compressed), including the home page
-						content. The rest is loaded on demand.
+						content. Achieves 100% score on a barebone page without extra themes
 					</Feature>
 					<Feature title="Great Dev experience">
 						<a class="link" href="https://hardhat.org" target="_blank" rel="noreferrer">Hardhat</a>
