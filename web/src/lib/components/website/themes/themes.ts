@@ -1,5 +1,9 @@
 export let themes = [
 	{
+		name: '🏴‍☠️  jolly-roger',
+		id: 'jolly-roger',
+	},
+	{
 		name: '🌝  light',
 		id: 'light',
 	},

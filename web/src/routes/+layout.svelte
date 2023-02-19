@@ -4,7 +4,7 @@
 	import ThemeChanger from '$lib/components/website/themes/ThemeChanger.svelte';
 </script>
 
-<div class="navbar bg-base-100">
+<div class="navbar bg-base-100 min-h-0 p-1">
 	<div class="flex-1">
 		<div class="tabs">
 			<NavElement class="tab tab-bordered" selected="tab-active" href="/">Home</NavElement>

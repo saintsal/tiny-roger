@@ -3,7 +3,7 @@
 	import Feature from '$lib/components/website/Feature.svelte';
 </script>
 
-<section class="py-2 px-4 text-center">
+<section class="pb-2 px-4 text-center">
 	<div class="max-w-auto md:max-w-lg mx-auto">
 		<img
 			class="mb-8 mx-auto"
@@ -13,15 +13,13 @@
 			width="256px"
 			height="256px"
 		/>
-		<h2 class="font-black mb-2 font-heading text-black dark:text-white !text-6xl">Jolly-Roger</h2>
-		<p class="m-6 text-gray-800 dark:text-gray-300 !text-xl">
-			Production-Ready Template To Build Decentralised Applications
-		</p>
+		<h2 class="mb-2 !text-6xl">Jolly-Roger</h2>
+		<p class="m-6 !text-xl">Production-Ready Template To Build Decentralised Applications</p>
 		<div class="max-w-md mx-auto pt-1 mt-5 space-y-3 md:m-8 md:space-y-5">
 			<div class="space-y-5 sm:flex sm:justify-center sm:space-y-0 sm:space-x-3">
-				<a class="btn variant-filled-primary" href="/demo/" aria-label="Try the Demo!">Demo</a>
+				<a class="btn btn-primary" href="/demo/" aria-label="Try the Demo!">Demo</a>
 				<a
-					class="btn variant-filled-secondary"
+					class="btn btn-secondary"
 					target="_blank"
 					rel="noreferrer"
 					href="https://github.com/wighawag/jolly-roger"
@@ -34,10 +32,12 @@
 
 		<div class="pt-3 pb-4 ">
 			<h1 class="m-4 font-semibold">Use it:</h1>
-			<code id="jolly-roger-command" class="mb-5 text-pink-600 font-black"
+			<code
+				id="jolly-roger-command"
+				class="mb-5 bg-reverse-primary text-primary font-black rounded-box p-2"
 				>npx degit wighawag/jolly-roger your-app-folder</code
 			>
-			<p class="mt-6 text-gray-500">
+			<p class="mt-6 text-base-300">
 				Find out more on
 				<a
 					class="underline"
@@ -51,12 +51,8 @@
 
 	<div class="pt-16 relative max-w-7xl mx-auto">
 		<div class="text-center">
-			<h2
-				class="text-3xl tracking-tight font-extrabold text-gray-900 dark:text-gray-100 sm:text-4xl"
-			>
-				Showcase
-			</h2>
-			<p class="mt-3 max-w-2xl mx-auto text-xl text-gray-500 dark:text-gray-400 sm:mt-4">
+			<h2 class="text-3xl tracking-tight font-extrabold sm:text-4xl">Showcase</h2>
+			<p class="mt-3 max-w-2xl mx-auto text-xl  sm:mt-4">
 				Here are examples of apps built using jolly-roger
 			</p>
 		</div>
@@ -106,22 +102,20 @@
 						content. The rest is loaded on demand.
 					</Feature>
 					<Feature title="Great Dev experience">
-						<a class="text-blue-600" href="https://hardhat.org" target="_blank" rel="noreferrer"
-							>Hardhat</a
-						>
+						<a class="link" href="https://hardhat.org" target="_blank" rel="noreferrer">Hardhat</a>
 						for contracts,
 						<a
-							class="text-blue-600"
+							class="link"
 							href="https://github.com/wighawag/hardhat-deploy"
 							target="_blank"
 							rel="noreferrer">hardhat-deploy</a
 						>
 						for contract deployment,
-						<a class="text-blue-600" href="https://thegraph.com" target="_blank" rel="noreferrer"
+						<a class="link" href="https://thegraph.com" target="_blank" rel="noreferrer"
 							>The Graph</a
 						>
 						for contract api,
-						<a class="text-blue-600" href="https://svelte.dev" target="_blank" rel="noreferrer"
+						<a class="link" href="https://svelte.dev" target="_blank" rel="noreferrer"
 							>svelte + Svelte Kit</a
 						>
 						for frontend with HMR (Hot Module Replacement) and production build.
@@ -129,9 +123,7 @@
 					<Feature title="Everything Hot Reload">
 						On contract changes, contract get to keep their address and code get updated
 						automatically. On frontend changes, module get replaced using blazing fast
-						<a class="text-blue-600" href="https://vite.dev" target="_blank" rel="noreferrer"
-							>Vite</a
-						>
+						<a class="link" href="https://vite.dev" target="_blank" rel="noreferrer">Vite</a>
 						es module hot reload. On subgraph changes, the graph get updated and reexecuted.
 					</Feature>
 					<Feature title="Fully IPFS Ready">
@@ -152,9 +144,7 @@
 					<Feature title="One command deploy">
 						Everything is setup, except for the private ENV variable to deploy the contracts, the
 						subgraph and the web app, all at once. It also include
-						<a class="text-blue-600" href="https://fleek.co" target="_blank" rel="noreferrer"
-							>fleek</a
-						>
+						<a class="link" href="https://fleek.co" target="_blank" rel="noreferrer">fleek</a>
 						config for automatic web deployment on ipfs.
 					</Feature>
 				</div>
