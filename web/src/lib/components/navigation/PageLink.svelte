@@ -5,11 +5,12 @@
 	export let href: string;
 	let className = '';
 	export { className as class };
-	export let selected: string = '';
-	export let unselected: string = '';
+	export let whenSelected: string = '';
+	export let whenUnselected: string = '';
 </script>
 
 <a
 	href={pathname(href)}
-	class={`${className} ${isSameURL($page.url.pathname, href) ? selected : unselected}`}><slot /></a
+	class={`${className} ${isSameURL($page.url.pathname, href) ? whenSelected : whenUnselected}`}
+	><slot /></a
 >

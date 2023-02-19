@@ -1,6 +1,6 @@
 <script>
-	import Showcase from '$lib/components/website/Showcase.svelte';
-	import Feature from '$lib/components/website/Feature.svelte';
+	import Showcase from '$lib/components/jolly-roger/Showcase.svelte';
+	import Feature from '$lib/components/jolly-roger/Feature.svelte';
 </script>
 
 <section class="py-2 px-4 text-center">
