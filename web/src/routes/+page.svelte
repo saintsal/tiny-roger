@@ -13,7 +13,7 @@
 			width="256px"
 			height="256px"
 		/>
-		<h2 class="mb-2 !text-6xl">Jolly-Roger</h2>
+		<h2 class="mb-2 !text-6xl font-black">Jolly Roger</h2>
 		<p class="m-6 !text-xl">Production-Ready Template To Build Decentralised Applications</p>
 		<div class="max-w-md mx-auto pt-1 mt-5 space-y-3 md:m-8 md:space-y-5">
 			<div class="space-y-5 sm:flex sm:justify-center sm:space-y-0 sm:space-x-3">
