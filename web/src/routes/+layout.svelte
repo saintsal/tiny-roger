@@ -4,7 +4,7 @@
 	import NavTabs from '$lib/components/daisyui/NavTabs.svelte';
 </script>
 
-<div class="navbar bg-base-100 min-h-0 p-1 border-b-2">
+<div class="navbar bg-base-100 min-h-0 p-1 border-b-2 border-primary">
 	<div class="flex-1">
 		<NavTabs
 			pages={[

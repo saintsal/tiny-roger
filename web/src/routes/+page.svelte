@@ -3,7 +3,7 @@
 	import Feature from '$lib/components/jolly-roger/Feature.svelte';
 </script>
 
-<section class="pb-2 px-4 text-center">
+<section class="py-2 px-4 text-center">
 	<div class="max-w-auto md:max-w-lg mx-auto">
 		<img
 			class="mb-1 mx-auto"
