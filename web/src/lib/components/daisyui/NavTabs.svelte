@@ -6,6 +6,10 @@
 
 <div class="tabs tabs-boxed bg-base-100">
 	{#each pages as page}
-		<PageLink class="tab" whenSelected="tab-active" href={page.pathname}>{page.title}</PageLink>
+		<PageLink
+			class="tab text-base-content"
+			whenSelected="tab-active !text-base-100"
+			href={page.pathname}>{page.title}</PageLink
+		>
 	{/each}
 </div>

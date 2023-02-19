@@ -20,6 +20,10 @@
 	// }
 </script>
 
+<svelte:head>
+	<title>{name}, Build and Deploy for Eternity.</title>
+</svelte:head>
+
 <section class="py-2 px-4 text-center">
 	<div class="max-w-auto md:max-w-lg mx-auto">
 		<img
@@ -135,8 +139,8 @@
 			<div class="max-w-xl mx-auto px-4 sm:px-6 lg:max-w-screen-xl lg:px-8">
 				<div class="lg:grid lg:grid-cols-3 lg:gap-8">
 					<Feature title="All Included">
-						This template include setup for smart contracts, subgraph (contract api) and frontend.
-						All is setup as a monorepo with a shared common library.
+						This template include setup for smart contracts, indexer and frontend. All runs locally
+						for the best-in-class developer experience.
 					</Feature>
 					<Feature title="PWA ready: 100% Lighthouse score">
 						The web app is fully PWA compliant, with offline caching, etc... The javascript code
@@ -152,11 +156,14 @@
 							target="_blank"
 							rel="noreferrer">hardhat-deploy</a
 						>
-						for contract deployment,
-						<a class="link" href="https://thegraph.com" target="_blank" rel="noreferrer"
-							>The Graph</a
+						for contract deployment, the in-browser
+						<a
+							class="link"
+							href="http://npmjs.com/package/ethereum-indexer"
+							target="_blank"
+							rel="noreferrer">ethereum-indexer</a
 						>
-						for contract api,
+						for contract's api,
 						<a class="link" href="https://svelte.dev" target="_blank" rel="noreferrer"
 							>svelte + Svelte Kit</a
 						>
@@ -166,7 +173,7 @@
 						On contract changes, contract get to keep their address and code get updated
 						automatically. On frontend changes, module get replaced using blazing fast
 						<a class="link" href="https://vite.dev" target="_blank" rel="noreferrer">Vite</a>
-						es module hot reload. On subgraph changes, the graph get updated and reexecuted.
+						es module hot reload.
 					</Feature>
 					<Feature title="Fully IPFS Ready">
 						Fully IPFS ready with proper url routing. The web app works on both IPFS urls and
@@ -184,10 +191,8 @@
 						editor. Auto format, etc...
 					</Feature>
 					<Feature title="One command deploy">
-						Everything is setup, except for the private ENV variable to deploy the contracts, the
-						subgraph and the web app, all at once. It also include
-						<a class="link" href="https://fleek.co" target="_blank" rel="noreferrer">fleek</a>
-						config for automatic web deployment on ipfs.
+						Everything is setup, except for the private ENV variable to deploy the contracts and the
+						web app, all at once.
 					</Feature>
 				</div>
 			</div>
