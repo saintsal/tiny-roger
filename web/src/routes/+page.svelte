@@ -17,9 +17,9 @@
 		<p class="m-6 !text-xl">Production-Ready Template To Build Decentralised Applications</p>
 		<div class="max-w-md mx-auto pt-1 mt-5 space-y-3 md:m-8 md:space-y-5">
 			<div class="space-y-5 sm:flex sm:justify-center sm:space-y-0 sm:space-x-3">
-				<a class="btn btn-primary" href="/demo/" aria-label="Try the Demo!">Demo</a>
+				<a class="btn btn-primary btn-wide" href="/demo/" aria-label="Try the Demo!">Demo</a>
 				<a
-					class="btn btn-secondary"
+					class="btn btn-secondary btn-wide"
 					target="_blank"
 					rel="noreferrer"
 					href="https://github.com/wighawag/jolly-roger"
@@ -32,11 +32,11 @@
 
 		<div class="pt-3 pb-4 ">
 			<h1 class="m-4 font-semibold">Use it:</h1>
-			<code
-				id="jolly-roger-command"
-				class="mb-5 bg-reverse-primary text-primary font-black rounded-box p-2"
-				>npx degit wighawag/jolly-roger your-app-folder</code
-			>
+			<div class="bg-reverse-primary rounded-box p-2 box-content">
+				<code id="jolly-roger-command" class="mb-5 text-primary font-black rounded-box"
+					>npx degit wighawag/jolly-roger your-app-folder</code
+				>
+			</div>
 			<p class="mt-6 text-base-300">
 				Find out more on
 				<a
@@ -85,11 +85,7 @@
 		</div>
 
 		<div class="pt-16 pb-4">
-			<h2
-				class="text-3xl tracking-tight font-extrabold text-gray-900 dark:text-gray-100 sm:text-4xl"
-			>
-				Features
-			</h2>
+			<h2 class="text-3xl tracking-tight font-extrabold sm:text-4xl">Features</h2>
 			<div class="max-w-xl mx-auto px-4 sm:px-6 lg:max-w-screen-xl lg:px-8">
 				<div class="lg:grid lg:grid-cols-3 lg:gap-8">
 					<Feature title="All Included">

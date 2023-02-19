@@ -26,6 +26,7 @@ const config = {
 					neutral: '#263140',
 
 					'base-100': '#FFFFFF',
+					'base-200': '#FFEEEE',
 
 					info: '#487BDB',
 
