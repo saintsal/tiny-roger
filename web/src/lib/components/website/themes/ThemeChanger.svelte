@@ -40,7 +40,7 @@
 		>
 	</div>
 	<div
-		class={`dropdown-content bg-base-200 text-base-content rounded-t-box rounded-b-box top-px max-h-96 h-[70vh] w-52 overflow-y-auto shadow-2xl ${contentClasses}`}
+		class={`dropdown-content bg-base-200 text-base-content rounded-t-box rounded-b-box top-px max-h-96 h-[70vh] w-64 overflow-y-auto shadow-2xl ${contentClasses}`}
 	>
 		<div class="grid grid-cols-1 gap-3 p-3" tabindex="0">
 			{#each themes as theme}
@@ -67,7 +67,7 @@
 									/></svg
 								>
 								<div class="flex-grow text-sm font-bold">
-									{theme.id}
+									{theme.name}
 								</div>
 								<div class="flex flex-shrink-0 flex-wrap gap-1 h-full">
 									<div class="bg-primary w-2 rounded" />
