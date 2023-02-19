@@ -1,6 +1,23 @@
-<script>
+<script lang="ts">
 	import Showcase from '$lib/components/jolly-roger/Showcase.svelte';
 	import Feature from '$lib/components/jolly-roger/Feature.svelte';
+	import CopyBlock from '$lib/components/utilities/CopyBlock.svelte';
+
+	const name = 'Jolly Roger';
+
+	// function _select(elem: HTMLElement) {
+	// 	const range = document.createRange();
+	// 	const selection = window.getSelection();
+	// 	range.selectNodeContents(elem);
+	// 	console.log({ selection: range.toString() });
+	// 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	// 	(selection as any).removeAllRanges();
+	// 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	// 	(selection as any).addRange(range);
+	// }
+	// function select(e: MouseEvent) {
+	// 	_select(e.currentTarget as HTMLElement);
+	// }
 </script>
 
 <section class="py-2 px-4 text-center">
@@ -8,7 +25,7 @@
 		<img
 			class="mb-1 mx-auto"
 			src="/images/logo.svg"
-			alt="Jolly-Roger"
+			alt={name}
 			style="width:256px;height:256px;"
 			width="256px"
 			height="256px"
@@ -16,7 +33,7 @@
 		<h2
 			class="mb-2 text-title font-black bg-gradient-to-br from-pink-600 via-pink-600 to-purple-600 bg-clip-text text-transparent box-decoration-clone"
 		>
-			Jolly Roger
+			{name}
 		</h2>
 		<div class="!text-xl flex justify-center space-x-2">
 			<h3>
@@ -58,11 +75,14 @@
 
 		<div class="pt-3 pb-4 ">
 			<h1 class="m-4 font-semibold">Use it:</h1>
-			<div class="bg-reverse-primary rounded-box p-2 box-content">
-				<code id="jolly-roger-command" class="mb-5 text-primary font-black rounded-box"
-					>npx degit wighawag/jolly-roger your-app-folder</code
-				>
-			</div>
+			<CopyBlock
+				boxClass="p-2 rounded-box font-black text-primary"
+				class="mb-5"
+				background="bg-reverse-primary"
+				copiedBackground="bg-success"
+				copiedColor="text-success-content"
+				text={`npx degit wighawag/jolly-roger your-app-folder`}
+			/>
 			<p class="mt-6 text-base-300">
 				Find out more on
 				<a
