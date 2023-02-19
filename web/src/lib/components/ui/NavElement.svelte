@@ -3,12 +3,13 @@
 	import { pathname, isSameURL } from '$lib/utils/url';
 
 	export let href: string;
+	let className = '';
+	export { className as class };
+	export let selected: string = '';
+	export let unselected: string = '';
 </script>
 
-<a href={pathname(href)}
-	><span
-		class={`chip mx-2 ${
-			isSameURL($page.url.pathname, href) ? 'variant-filled-surface' : 'variant-soft-surface'
-		}`}><slot /></span
-	></a
+<a
+	href={pathname(href)}
+	class={`${className} ${isSameURL($page.url.pathname, href) ? selected : unselected}`}><slot /></a
 >

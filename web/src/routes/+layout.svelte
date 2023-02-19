@@ -1,26 +1,20 @@
 <script>
-	import '@skeletonlabs/skeleton/themes/theme-skeleton.css';
-	// import '@skeletonlabs/skeleton/themes/theme-seafoam.css';
-	import '@skeletonlabs/skeleton/styles/all.css';
 	import '../app.postcss';
-
-	import { AppBar, AppShell, LightSwitch } from '@skeletonlabs/skeleton';
 	import NavElement from '$lib/components/ui/NavElement.svelte';
+	import ThemeChanger from '$lib/components/website/themes/ThemeChanger.svelte';
 </script>
 
-<AppShell slotHeader="bg-surface-500/5 w-56 p-4">
-	<svelte:fragment slot="pageHeader">
-		<AppBar>
-			<svelte:fragment slot="lead">
-				<NavElement href="/">Home</NavElement>
-				<NavElement href="/demo/">Demo</NavElement>
-				<NavElement href="/test/">Test</NavElement>
-			</svelte:fragment>
+<div class="navbar bg-base-100">
+	<div class="flex-1">
+		<div class="tabs">
+			<NavElement class="tab tab-bordered" selected="tab-active" href="/">Home</NavElement>
+			<NavElement class="tab tab-bordered" selected="tab-active" href="/demo/">Demo</NavElement>
+			<NavElement class="tab tab-bordered" selected="tab-active" href="/test/">Test</NavElement>
+		</div>
+	</div>
+	<div class="flex-none">
+		<ThemeChanger />
+	</div>
+</div>
 
-			<svelte:fragment slot="trail"><LightSwitch /></svelte:fragment>
-			<!-- <svelte:fragment slot="headline">(headline)</svelte:fragment> -->
-		</AppBar>
-	</svelte:fragment>
-
-	<slot />
-</AppShell>
+<slot />

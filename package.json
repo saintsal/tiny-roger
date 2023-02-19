@@ -1,7 +1,8 @@
 {
-  "name": "tiny-roger",
+  "name": "jolly-roger",
   "version": "0.1.0",
-  "description": "tiny-roger",
+  "description": "Template to develop fully decentralised app and games",
+  "private": true,
   "devDependencies": {
     "dotenv-extended": "^2.9.0",
     "syncpack": "^8.2.4"

@@ -1,7 +1,7 @@
 {
-	"name": "tiny-roger-contracts",
+	"name": "jolly-roger-contracts",
 	"version": "0.1.0",
-	"description": "contracts for tiny-roger",
+	"description": "contracts for jolly-roger",
 	"private": true,
 	"author": "wighawag",
 	"license": "AGPL",
