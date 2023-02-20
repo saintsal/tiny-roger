@@ -37,6 +37,7 @@
 		"serve": "ipfs-emulator --only -d build -p 8080"
 	},
 	"dependencies": {
+		"named-logs": "^0.2.0",
 		"theme-change": "^2.3.0"
 	}
 }
