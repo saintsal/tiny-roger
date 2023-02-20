@@ -27,7 +27,7 @@ jobs:
       #   id: cid
       #   run: pnpm run --filter ./web deploy >> "$GITHUB_OUTPUT"
       - name: install deployment tool
-        run: pnpm add -g upload-to-ipfs
+        run: pnpm add -g upload-to-ipfs@0.0.4
       - name: deploy to ipfs
         id: cid
         env:
