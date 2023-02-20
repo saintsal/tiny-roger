@@ -11,6 +11,7 @@ const config = {
 
 	plugins: [forms, typography, daisyui],
 	daisyui: {
+		darkTheme: 'dracula',
 		themes: [
 			{
 				'jolly-roger': {

@@ -7,8 +7,6 @@ const VERSION = execSync('git rev-parse --short HEAD').toString().trim();
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
-	// Consult https://kit.svelte.dev/docs/integrations#preprocessors
-	// for more information about preprocessors
 	preprocess: [
 		vitePreprocess(),
 		preprocess({
@@ -23,6 +21,12 @@ const config = {
 		}),
 		version: {
 			name: VERSION,
+		},
+		alias: {
+			'web-config': './src/web-config.json',
+		},
+		serviceWorker: {
+			register: false,
 		},
 	},
 };

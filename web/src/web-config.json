@@ -1,8 +1,7 @@
 {
-	"appName": "Jolly Roger",
-	"appShortName": "Jolly Roger",
-	"appDescription": "Build and Deploy for Eternity. Joll Roger is a production-ready template for decentralised applications.",
-	"appShortDescription": "Build and Deploy for Eternity.",
+	"name": "Jolly Roger",
+	"title": "Jolly Roger - Template for Decentralised Applications.",
+	"description": "Build and Deploy for Eternity. Jolly Roger is a production-ready template for decentralised applications.",
 	"developerName": "Ronan Sandford",
 	"developerURL": "https://ronan.eth.limo",
 	"url": "https://jolly-roger.eth.limo",

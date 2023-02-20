@@ -3,26 +3,9 @@
 	import Feature from '$lib/components/jolly-roger/Feature.svelte';
 	import CopyBlock from '$lib/components/utilities/CopyBlock.svelte';
 
-	const name = 'Jolly Roger';
-
-	// function _select(elem: HTMLElement) {
-	// 	const range = document.createRange();
-	// 	const selection = window.getSelection();
-	// 	range.selectNodeContents(elem);
-	// 	console.log({ selection: range.toString() });
-	// 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	// 	(selection as any).removeAllRanges();
-	// 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	// 	(selection as any).addRange(range);
-	// }
-	// function select(e: MouseEvent) {
-	// 	_select(e.currentTarget as HTMLElement);
-	// }
+	import { name } from 'web-config';
 </script>
 
-<svelte:head>
-	<title>{name}, Build and Deploy for Eternity.</title>
-</svelte:head>
 
 <section class="py-2 px-4 text-center">
 	<div class="max-w-auto md:max-w-lg mx-auto">
@@ -103,7 +86,7 @@
 		<div class="text-center">
 			<h2 class="text-3xl tracking-tight font-extrabold sm:text-4xl">Showcase</h2>
 			<p class="mt-3 max-w-2xl mx-auto text-xl  sm:mt-4">
-				Here are examples of apps built using jolly-roger
+				Here are examples of apps built using "{name}"
 			</p>
 		</div>
 		<div class="mt-12 max-w-lg mx-auto grid gap-5 lg:grid-cols-3 lg:max-w-none">
