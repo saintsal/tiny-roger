@@ -1,9 +1,13 @@
 import { build, version, prerendered, files } from '$service-worker';
+import applicaion from './application.json';
 
 ///////////////////////////////////////////////////////////////////////////////
-const URLS_TO_PRE_CACHE = build
-	.concat(prerendered)
-	.concat(files.filter((v) => v.indexOf('pwa/') === -1));
+let URLS_TO_PRE_CACHE: string[] = [];
+if ((applicaion.offlineCache as any) === 'all') {
+	URLS_TO_PRE_CACHE = build
+		.concat(prerendered)
+		.concat(files.filter((v) => v.indexOf('pwa/') === -1));
+} // TODO support more offline option
 const CACHE_NAME = 'cache-name' + version;
 const DEV = true;
 //////////////////////////////////////////////////////////////////////////////

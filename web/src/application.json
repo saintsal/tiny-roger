@@ -12,6 +12,7 @@
 	"appleStatusBarStyle": "black-translucent",
 	"display": "fullscreen",
 	"icon": "static/icon.svg",
+	"offlineCache": false,
 	"maskable_icons": [
 		{
 			"src": "maskable_icon_512x512.png",
