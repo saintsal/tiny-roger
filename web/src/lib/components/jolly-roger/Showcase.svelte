@@ -29,12 +29,9 @@
 				</p>
 				<p class="mt-3 text-base">
 					{#if source}
-						Source code available <a
-							href={source}
-							target="_blank"
-							rel="noreferrer"
-							class="underline">here</a
-						>
+						Check the <a href={source} target="_blank" rel="noreferrer" class="underline"
+							>source code</a
+						>.
 					{:else}Source code not yet available{/if}
 				</p>
 			</div>
