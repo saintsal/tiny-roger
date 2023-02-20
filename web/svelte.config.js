@@ -1,6 +1,9 @@
 import preprocess from 'svelte-preprocess';
 import adapter from '@sveltejs/adapter-static';
 import { vitePreprocess } from '@sveltejs/kit/vite';
+import { execSync } from 'child_process';
+
+const VERSION = execSync('git rev-parse --short HEAD').toString().trim();
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
@@ -18,6 +21,9 @@ const config = {
 			pages: 'build',
 			strict: true,
 		}),
+		version: {
+			name: VERSION,
+		},
 	},
 };
 
