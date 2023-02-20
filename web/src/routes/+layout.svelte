@@ -33,7 +33,7 @@
 			pages={[
 				{ pathname: '/', title: 'Home' },
 				{ pathname: '/demo/', title: 'Demo' },
-				{ pathname: '/test/', title: 'Test' },
+				{ pathname: '/about/', title: 'About' },
 			]}
 		/>
 	</div>
