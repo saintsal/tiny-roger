@@ -41,4 +41,4 @@ jobs:
       - name: echo ENS_NAME
         run: 'echo "name: $ENS_NAME"'
       - name: IPNS update
-        run: 'curl "https://dwebservices.xyz/api/eth-names-ipns/$ENS_NAME/publish_by_name/${{ steps.cid.outputs.CID }}/" -H "Authorization: Bearer $DWEBSERVICE_API_TOKEN"'
+        run: 'curl -X "GET" "https://dwebservices.xyz/api/eth-names-ipns/$ENS_NAME/publish_by_name/${{ steps.cid.outputs.CID }}/" -H "accept: application/json" -H "Authorization: Bearer $DWEBSERVICE_API_TOKEN"'
