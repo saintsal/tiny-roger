@@ -8,7 +8,12 @@
 	// TODO allow to pass themes to switch: export let themes: [string, string];
 </script>
 
-<button id="theme-switcher" data-toggle-theme="dark,light" data-act-class="ACTIVECLASS">
+<button
+	id="theme-switcher"
+	data-toggle-theme="dark,light"
+	data-act-class="ACTIVECLASS"
+	aria-label="Switch Theme"
+>
 	<svg
 		class="w-8 h-8"
 		xmlns="http://www.w3.org/2000/svg"

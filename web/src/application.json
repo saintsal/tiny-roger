@@ -1,0 +1,22 @@
+{
+	"appName": "Jolly Roger",
+	"appShortName": "Jolly Roger",
+	"appDescription": "Build and Deploy for Eternity. Joll Roger is a production-ready template for decentralised applications.",
+	"appShortDescription": "Build and Deploy for Eternity.",
+	"developerName": "Ronan Sandford",
+	"developerURL": "https://ronan.eth.limo",
+	"url": "https://jolly-roger.eth.limo",
+	"ensName": "jolly-roger.eth",
+	"background": "#000000",
+	"theme_color": "#000000",
+	"appleStatusBarStyle": "black-translucent",
+	"display": "fullscreen",
+	"icon": "static/icon.svg",
+	"maskable_icons": [
+		{
+			"src": "maskable_icon_512x512.png",
+			"type": "image/png",
+			"sizes": "512x512"
+		}
+	]
+}

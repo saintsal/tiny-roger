@@ -13,6 +13,7 @@
 		"ipfs-gateway-emulator": "4.2.1-ipfs.2",
 		"postcss": "^8.4.14",
 		"postcss-load-config": "^4.0.1",
+		"prepare-for-web": "^0.1.9",
 		"prettier": "^2.8.4",
 		"prettier-plugin-svelte": "^2.8.1",
 		"svelte": "^3.54.0",
@@ -25,6 +26,7 @@
 	},
 	"type": "module",
 	"scripts": {
+		"prepare": "prepare-for-web --config src/application.json --target static --targetFile src/app.html",
 		"dev": "vite dev",
 		"build": "vite build",
 		"preview": "vite preview",

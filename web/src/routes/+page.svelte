@@ -28,7 +28,7 @@
 	<div class="max-w-auto md:max-w-lg mx-auto">
 		<img
 			class="mb-1 mx-auto"
-			src="/images/logo.svg"
+			src="/icon.svg"
 			alt={name}
 			style="width:256px;height:256px;"
 			width="256px"

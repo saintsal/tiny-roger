@@ -48,6 +48,7 @@
 					class="outline-base-content overflow-hidden rounded-lg text-left"
 					data-set-theme={theme.id}
 					data-act-class="[&_svg]:visible"
+					aria-label={theme.name}
 				>
 					<div
 						data-theme={theme.id}

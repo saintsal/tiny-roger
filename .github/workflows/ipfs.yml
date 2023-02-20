@@ -7,6 +7,7 @@ env:
   ENS_NAME: ${{ vars.ENS_NAME }}
   NFT_STORAGE_API_TOKEN: ${{ secrets.NFT_STORAGE_API_TOKEN }}
   DWEBSERVICE_API_TOKEN: ${{ secrets.DWEBSERVICE_API_TOKEN }}
+  DWEBSERVICE_UUID: ${{ secrets.DWEBSERVICE_UUID }}
 
 jobs:
   build:
@@ -41,4 +42,8 @@ jobs:
       - name: echo ENS_NAME
         run: 'echo "name: $ENS_NAME"'
       - name: IPNS update
+        if: ${{ ! env.DWEBSERVICE_UUID }}
         run: 'curl -X "GET" "https://dwebservices.xyz/api/eth-names-ipns/$ENS_NAME/publish_by_name/${{ steps.cid.outputs.CID }}/" -H "accept: application/json" -H "Authorization: Bearer $DWEBSERVICE_API_TOKEN"'
+      - name: IPNS update
+        if: ${{ env.DWEBSERVICE_UUID }}
+        run: 'curl -X "GET" "https://dwebservices.xyz/api/eth-names-ipns/$DWEBSERVICE_UUID/publish/${{ steps.cid.outputs.CID }}/" -H "accept: application/json" -H "Authorization: Bearer $DWEBSERVICE_API_TOKEN"'

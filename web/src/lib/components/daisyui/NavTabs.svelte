@@ -8,7 +8,7 @@
 	{#each pages as page}
 		<PageLink
 			class="tab text-base-content"
-			whenSelected="tab-active !text-base-100"
+			whenSelected="tab-active !text-base-100 font-black"
 			href={page.pathname}>{page.title}</PageLink
 		>
 	{/each}
