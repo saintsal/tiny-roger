@@ -32,7 +32,7 @@
 						Check the <a href={source} target="_blank" rel="noreferrer" class="underline"
 							>source code</a
 						>.
-					{:else}Source code not yet available{/if}
+					{:else}Source code not yet available.{/if}
 				</p>
 			</div>
 		</div>
