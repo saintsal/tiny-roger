@@ -1,7 +1,9 @@
 import { build, version, prerendered, files } from '$service-worker';
 
 ///////////////////////////////////////////////////////////////////////////////
-const URLS_TO_PRE_CACHE = build.concat(prerendered).concat(files);
+const URLS_TO_PRE_CACHE = build
+	.concat(prerendered)
+	.concat(files.filter((v) => v.indexOf('pwa/') === -1));
 const CACHE_NAME = 'cache-name' + version;
 const DEV = true;
 //////////////////////////////////////////////////////////////////////////////
