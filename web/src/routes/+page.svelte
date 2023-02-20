@@ -109,7 +109,7 @@
 		<div class="mt-12 max-w-lg mx-auto grid gap-5 lg:grid-cols-3 lg:max-w-none">
 			<Showcase
 				href="https://bleeps.art"
-				preview="https://bleeps.art/preview.png"
+				preview="/images/bleeps-preview-small.png"
 				name="bleeps.art"
 				title="The Bleeps DAO and Its Fully Onchain Sounds"
 				description="The First Composable Sounds Fully Generated On-Chain With Zero Externalities, no backend, no ipfs, no client-code, and a melody minter where some of the proceeds goes to the Bleeps DAO and its members"
@@ -118,7 +118,7 @@
 
 			<Showcase
 				href="https://mandalas.eth.limo"
-				preview="https://mandalas.eth.limo/preview.png"
+				preview="/images/mandalas-preview-small.png"
 				name="mandalas.eth"
 				title="On-chain Generative Bitmaps With Zero Externalities"
 				description="The First On-Chain Generative Art Project to make full use of token URI to remove all external dependencies. It generates SVG and Bitmap from the smart contract directly."
@@ -127,7 +127,7 @@
 
 			<Showcase
 				href="https://conquest.eth.limo"
-				preview="https://conquest.eth.limo/preview.png"
+				preview="/images/conquest-preview-small.png"
 				name="conquest.eth"
 				title="A Game of Strategy and Diplomacy Running on the EVM"
 				description="An unstoppable game of strategy and diplomacy running on the EVM. It allows player to collaborate through on-chain alliances while remaining sovereign. A first of its kind."
