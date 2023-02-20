@@ -1,0 +1,35 @@
+name: build and deploy
+on:
+  - push
+  - pull_request
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        node-version: [16]
+    steps:
+      - uses: actions/checkout@v3
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 7
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "pnpm"
+      - name: Install dependencies
+        run: pnpm install
+      - name: build web
+        run: pnpm run --filter ./web build
+      # - name: deploy web
+      #   id: cid
+      #   run: pnpm run --filter ./web deploy >> "$GITHUB_OUTPUT"
+      - name: install deployment tool
+        run: pnpm add -g upload-to-ipfs
+      - name: deploy to ipfs
+        id: cid
+        run: upload-to-ipfs web/build >> "$GITHUB_OUTPUT"
+      - name: echo CID
+        run: 'echo "Here is the URL: https://${{ steps.cid.outputs.CID }}.dweb.link"'
