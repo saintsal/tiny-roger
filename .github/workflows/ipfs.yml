@@ -30,6 +30,8 @@ jobs:
         run: pnpm add -g upload-to-ipfs
       - name: deploy to ipfs
         id: cid
+        env:
+          NFT_STORAGE_API_TOKEN: ${{ secrets.NFT_STORAGE_API_TOKEN }}
         run: upload-to-ipfs web/build >> "$GITHUB_OUTPUT"
       - name: echo CID
         run: 'echo "Here is the URL: https://${{ steps.cid.outputs.CID }}.dweb.link"'
