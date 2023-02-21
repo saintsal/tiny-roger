@@ -4,14 +4,14 @@
 	import CopyBlock from '$lib/components/utilities/CopyBlock.svelte';
 
 	import { name } from 'web-config';
+	import { url } from '$lib/utils/url';
 </script>
-
 
 <section class="py-2 px-4 text-center">
 	<div class="max-w-auto md:max-w-lg mx-auto">
 		<img
 			class="mb-1 mx-auto"
-			src="/icon.svg"
+			src={url('/icon.svg')}
 			alt={name}
 			style="width:256px;height:256px;"
 			width="256px"

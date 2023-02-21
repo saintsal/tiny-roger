@@ -8,18 +8,14 @@ export function pathname(p: string) {
 	return path;
 }
 
+export function url(p: string) {
+	return `${base}${p}`;
+}
+
 export function isSameURL(a: string, b: string): boolean {
-	if (typeof window !== 'undefined' && a.startsWith((window as any).BASE)) {
-		return a.replace((window as any).BASE, '') === b;
-	} else {
-		return a === b;
-	}
+	return a === pathname(b);
 }
 
 export function isParentURL(a: string, b: string): boolean {
-	if (typeof window !== 'undefined' && a.startsWith((window as any).BASE)) {
-		return a.replace((window as any).BASE, '').startsWith(b);
-	} else {
-		return a.startsWith(b);
-	}
+	return a.startsWith(pathname(b));
 }

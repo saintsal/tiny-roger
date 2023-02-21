@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { url } from '$lib/utils/url';
+
 	export let href: string;
 	export let preview: string;
 	export let name: string;
@@ -10,7 +12,7 @@
 <div class="flex flex-col rounded-lg shadow-lg bg-base-200 overflow-hidden">
 	<div class="flex-shrink-0">
 		<a {href} target="_blank" rel="noreferrer"
-			><img class="h-48 w-full object-cover" src={preview} alt={name} /></a
+			><img class="h-48 w-full object-cover" src={url(preview)} alt={name} /></a
 		>
 	</div>
 	<div class="flex-1 p-6 flex flex-col justify-between">
