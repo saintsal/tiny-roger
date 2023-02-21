@@ -17,11 +17,6 @@
 				document.documentElement.setAttribute('data-theme', localStorage.getItem('theme'));
 			} catch (e) {}
 		</script>
-
-		<script>
-			// ensure we save href as they are loaded, so they do not change on page navigation
-			document.querySelectorAll('link[href]').forEach((v) => (v.href = v.href));
-		</script>
 	</head>
 	<body data-sveltekit-preload-data="hover">
 		<div style="display: contents">%sveltekit.body%</div>
