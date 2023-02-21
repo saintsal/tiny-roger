@@ -3,7 +3,14 @@
 	import ThemeChanger from '$lib/components/daisyui/ThemeChanger.svelte';
 	import NavTabs from '$lib/components/daisyui/NavTabs.svelte';
 
-	import { name, description, themeColor, canonicalURL, appleStatusBarStyle } from 'web-config';
+	import {
+		name,
+		description,
+		themeColor,
+		canonicalURL,
+		appleStatusBarStyle,
+		ENSName,
+	} from 'web-config';
 
 	const host = canonicalURL.endsWith('/') ? canonicalURL : canonicalURL + '/';
 	const previewImage = host + 'preview.png';
@@ -13,6 +20,8 @@
 	<title>{name}</title>
 	<meta name="title" content={name} />
 	<meta name="description" content={description} />
+	{#if ENSName}<meta name="Dwebsite" content={ENSName} /> {/if}
+
 	<meta property="og:type" content="website" />
 	<meta property="og:url" content={host} />
 	<meta property="og:title" content={name} />
@@ -40,12 +49,6 @@
 	<meta name="apple-mobile-web-app-capable" content="yes" />
 	<meta name="apple-mobile-web-app-status-bar-style" content={appleStatusBarStyle} />
 	<meta name="apple-mobile-web-app-title" content={name} />
-	<!-- <link rel="apple-touch-startup-image" href="./pwa/apple-touch-startup-image.png"> -->
-
-	<!-- microsoft-->
-	<!-- <meta name="msapplication-TileColor" content={themeColor} /> -->
-	<!-- <meta name="msapplication-TileImage" content="./pwa/mstile-144x144.png" /> -->
-	<!-- <meta name="msapplication-config" content="./pwa/browserconfig.xml" /> -->
 </svelte:head>
 
 <div class="sticky top-0 z-50 navbar bg-base-100 min-h-0 p-1 border-b-2 border-primary">
