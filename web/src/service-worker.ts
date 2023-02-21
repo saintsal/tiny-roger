@@ -1,16 +1,15 @@
 import { build, version, prerendered, files } from '$service-worker';
-import webConfig from './web-config.json';
+// ------------------- CONFIG ---------------------------
+const DEV = true;
+const OFFLINE_CACHE = 'all';
+// ------------------------------------------------------
 
-///////////////////////////////////////////////////////////////////////////////
 let URLS_TO_PRE_CACHE: string[] = [];
-if ((webConfig.offlineCache as any) === 'all') {
+if (OFFLINE_CACHE === 'all') {
 	URLS_TO_PRE_CACHE = build
 		.concat(prerendered)
 		.concat(files.filter((v) => v.indexOf('pwa/') === -1));
 } // TODO support more offline option
-const CACHE_NAME = 'cache-name' + version;
-const DEV = true;
-//////////////////////////////////////////////////////////////////////////////
 
 let _logEnabled = true; // TODO false
 function log(...args) {
@@ -18,6 +17,8 @@ function log(...args) {
 		console.debug(...args);
 	}
 }
+
+const CACHE_NAME = 'cache-name' + version;
 
 self.addEventListener('message', function (event) {
 	if (event.data && event.data.type === 'debug') {

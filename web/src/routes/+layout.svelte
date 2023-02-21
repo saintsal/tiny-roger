@@ -3,26 +3,49 @@
 	import ThemeChanger from '$lib/components/daisyui/ThemeChanger.svelte';
 	import NavTabs from '$lib/components/daisyui/NavTabs.svelte';
 
-	import { title, description, url as webURL } from 'web-config';
+	import { name, description, themeColor, canonicalURL, appleStatusBarStyle } from 'web-config';
 
-	const host = webURL.endsWith('/') ? webURL : webURL + '/';
+	const host = canonicalURL.endsWith('/') ? canonicalURL : canonicalURL + '/';
 	const previewImage = host + 'preview.png';
 </script>
 
 <svelte:head>
-	<title>{title}</title>
-	<meta name="title" content={title} />
+	<title>{name}</title>
+	<meta name="title" content={name} />
 	<meta name="description" content={description} />
 	<meta property="og:type" content="website" />
 	<meta property="og:url" content={host} />
-	<meta property="og:title" content={title} />
+	<meta property="og:title" content={name} />
 	<meta property="og:description" content={description} />
 	<meta property="og:image" content={previewImage} />
 	<meta property="twitter:card" content="summary_large_image" />
 	<meta property="twitter:url" content={host} />
-	<meta property="twitter:title" content={title} />
+	<meta property="twitter:title" content={name} />
 	<meta property="twitter:description" content={description} />
 	<meta property="twitter:image" content={previewImage} />
+
+	<!-- minimal -->
+	<!-- use SVG, if need PNG, adapt accordingly -->
+	<link rel="icon" href="/pwa/favicon.svg" type="image/svg+xml" />
+	<link rel="icon" href="/pwa/favicon.ico" sizes="any" /><!-- 32×32 -->
+	<link rel="apple-touch-icon" href="/pwa/apple-touch-icon.png" /><!-- 180×180 -->
+	<link rel="manifest" href="/pwa/manifest.webmanifest" />
+
+	<!-- extra info -->
+	<meta name="theme-color" content={themeColor} />
+	<meta name="mobile-web-app-capable" content="yes" />
+	<meta name="application-name" content={name} />
+
+	<!-- apple -->
+	<meta name="apple-mobile-web-app-capable" content="yes" />
+	<meta name="apple-mobile-web-app-status-bar-style" content={appleStatusBarStyle} />
+	<meta name="apple-mobile-web-app-title" content={name} />
+	<!-- <link rel="apple-touch-startup-image" href="./pwa/apple-touch-startup-image.png"> -->
+
+	<!-- microsoft-->
+	<!-- <meta name="msapplication-TileColor" content={themeColor} /> -->
+	<!-- <meta name="msapplication-TileImage" content="./pwa/mstile-144x144.png" /> -->
+	<!-- <meta name="msapplication-config" content="./pwa/browserconfig.xml" /> -->
 </svelte:head>
 
 <div class="sticky top-0 z-50 navbar bg-base-100 min-h-0 p-1 border-b-2 border-primary">
