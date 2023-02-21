@@ -1,0 +1,65 @@
+diff --git a/src/exports/vite/index.js b/src/exports/vite/index.js
+index 5517deb6ea448783148954a5aa0262620b41bbdf..eb2d39afdf5ad40e4dd0b1820ab86d2cb68809fd 100644
+--- a/src/exports/vite/index.js
++++ b/src/exports/vite/index.js
+@@ -375,7 +375,7 @@ function kit({ svelte_config }) {
+ 					const { assets, base } = svelte_config.kit.paths;
+ 
+ 					if (browser) {
+-						return `export const base = ${s(base)};
++						return `export const base = ${global}.base;
+ export const assets = ${global}.assets;`;
+ 					}
+ 
+diff --git a/src/internal.d.ts b/src/internal.d.ts
+index cfe9bf5485445f9c2e071579ea399e842ec888f0..a29fe366a20d18ff5e977b17f5f78df92b74c401 100644
+--- a/src/internal.d.ts
++++ b/src/internal.d.ts
+@@ -7,7 +7,7 @@ declare module '__sveltekit/environment' {
+ 
+ /** Internal version of $app/paths */
+ declare module '__sveltekit/paths' {
+-	export const base: `/${string}`;
++	export const base: string;
+ 	export let assets: `https://${string}` | `http://${string}`;
+ 	export function set_assets(path: string): void;
+ }
+diff --git a/src/runtime/server/page/render.js b/src/runtime/server/page/render.js
+index 92da25ad1916f73422c01e57b09feae3c6088a74..681622ceb5f72432d0f166bd840a70fd5ac7fecc 100644
+--- a/src/runtime/server/page/render.js
++++ b/src/runtime/server/page/render.js
+@@ -156,6 +156,16 @@ export async function render_response({
+ 		rendered = { head: '', html: '', css: { code: '', map: null } };
+ 	}
+ 
++	const segments = event.url.pathname.slice(base.length).split('/').slice(2);
++	const resolved_base = segments.length > 0 ? segments.map(() => '..').join('/') : '.';
++
++	let base_expression = s(base);
++	if (base === '') {
++		// if base is relative we use resolved_base so that they
++		// will work in odd contexts like IPFS, the internet archive, and so on
++		base_expression = `new URL(${s(resolved_base)}, location.href).pathname.slice(0,-1)`;
++	}
++
+ 	/**
+ 	 * The prefix to use for static assets. Replaces `%sveltekit.assets%` in the template
+ 	 * @type {string}
+@@ -178,8 +188,7 @@ export async function render_response({
+ 	} else {
+ 		// otherwise we want asset paths to be relative to the page, so that they
+ 		// will work in odd contexts like IPFS, the internet archive, and so on
+-		const segments = event.url.pathname.slice(base.length).split('/').slice(2);
+-		resolved_assets = segments.length > 0 ? segments.map(() => '..').join('/') : '.';
++		resolved_assets = resolved_base;
+ 		asset_expression = `new URL(${s(
+ 			resolved_assets
+ 		)}, location.href).pathname.replace(/^\\\/$/, '')`;
+@@ -286,6 +295,7 @@ export async function render_response({
+ 		const properties = [
+ 			`env: ${s(public_env)}`,
+ 			`assets: ${asset_expression}`,
++			`base: ${base_expression}`,
+ 			`element: document.currentScript.parentElement`
+ 		];
+ 

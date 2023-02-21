@@ -11,5 +11,10 @@
     "test": "dotenv-extended env",
     "dev": "dotenv-extended pnpm --parallel dev",
     "sync-deps": "syncpack fix-mismatches && pnpm -r format:fix"
+  },
+  "pnpm": {
+    "patchedDependencies": {
+      "@sveltejs/kit@1.8.3": "patches/@sveltejs__kit@1.8.3.patch"
+    }
   }
 }

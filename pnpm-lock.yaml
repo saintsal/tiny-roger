@@ -1,5 +1,10 @@
 lockfileVersion: 5.4
 
+patchedDependencies:
+  '@sveltejs/kit@1.8.3':
+    hash: 5ikgtkhlzgdgxg3ddmqxgewlsi
+    path: patches/@sveltejs__kit@1.8.3.patch
+
 importers:
 
   .:
@@ -118,7 +123,7 @@ importers:
       theme-change: 2.3.0
     devDependencies:
       '@sveltejs/adapter-static': 2.0.1_@sveltejs+kit@1.8.3
-      '@sveltejs/kit': 1.8.3_svelte@3.55.1+vite@4.1.1
+      '@sveltejs/kit': 1.8.3_5ikgtkhlzgdgxg3ddmqxgewlsi_svelte@3.55.1+vite@4.1.1
       '@tailwindcss/forms': 0.5.3_tailwindcss@3.2.6
       '@tailwindcss/typography': 0.5.9_tailwindcss@3.2.6
       autoprefixer: 10.4.13_postcss@8.4.21
@@ -1571,10 +1576,10 @@ packages:
     peerDependencies:
       '@sveltejs/kit': ^1.5.0
     dependencies:
-      '@sveltejs/kit': 1.8.3_svelte@3.55.1+vite@4.1.1
+      '@sveltejs/kit': 1.8.3_5ikgtkhlzgdgxg3ddmqxgewlsi_svelte@3.55.1+vite@4.1.1
     dev: true
 
-  /@sveltejs/kit/1.8.3_svelte@3.55.1+vite@4.1.1:
+  /@sveltejs/kit/1.8.3_5ikgtkhlzgdgxg3ddmqxgewlsi_svelte@3.55.1+vite@4.1.1:
     resolution: {integrity: sha512-32tiLy5PPpt2lquK2p53/5wR+ghAXw0HymIBEezmwmwtzx7Xf36xw3RG3fDYQ9gyzon89T+JRweXgAv/qhhvSQ==}
     engines: {node: ^16.14 || >=18}
     hasBin: true
@@ -1601,6 +1606,7 @@ packages:
     transitivePeerDependencies:
       - supports-color
     dev: true
+    patched: true
 
   /@sveltejs/vite-plugin-svelte/2.0.2_svelte@3.55.1+vite@4.1.1:
     resolution: {integrity: sha512-xCEan0/NNpQuL0l5aS42FjwQ6wwskdxC3pW1OeFtEKNZwRg7Evro9lac9HesGP6TdFsTv2xMes5ASQVKbCacxg==}
@@ -8377,7 +8383,7 @@ packages:
     peerDependencies:
       '@sveltejs/kit': ^1.5.0
     dependencies:
-      '@sveltejs/kit': 1.8.3_svelte@3.55.1+vite@4.1.1
+      '@sveltejs/kit': 1.8.3_5ikgtkhlzgdgxg3ddmqxgewlsi_svelte@3.55.1+vite@4.1.1
     dev: true
 
   /sync-request/6.1.0:
