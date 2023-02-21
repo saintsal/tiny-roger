@@ -20,7 +20,7 @@ const config = {
 			strict: true,
 			// works with sveltekit master
 			skipSingletonsAndPathsFiles: true,
-			skipInjectBase: true,
+			skipReplacementInIndexHTML: true,
 		}),
 		version: {
 			name: VERSION,

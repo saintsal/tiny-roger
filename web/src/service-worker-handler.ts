@@ -73,27 +73,25 @@ if (typeof navigator !== 'undefined' && 'serviceWorker' in navigator) {
 	});
 	// ------------------------------------------------------------------------------------------------
 
-	window.addEventListener('load', function () {
-		const swLocation = `${base}/service-worker.js`;
-		//{scope: base}
-		navigator.serviceWorker
-			.register(swLocation)
-			.then((registration) => {
-				try {
-					handleAutomaticUpdate(registration);
-				} catch (e) {}
-				serviceWorker.set({ registration, updateAvailable: false }); // TODO keep updateAvailable if any ?
-				updateLoggingForWorker(registration.installing);
-				updateLoggingForWorker(registration.waiting);
-				updateLoggingForWorker(registration.active);
-				listenForWaitingServiceWorker(registration, () => {
-					console.log('[Service Worker] Update found');
-					serviceWorker.set({ registration, updateAvailable: true });
-				});
-			})
-			.catch((e) => {
-				console.log(e);
-				// console.error('Failed to register service worker', e);
+	const swLocation = `${base}/service-worker.js`;
+	//{scope: `${base}/`}
+	navigator.serviceWorker
+		.register(swLocation)
+		.then((registration) => {
+			try {
+				handleAutomaticUpdate(registration);
+			} catch (e) {}
+			serviceWorker.set({ registration, updateAvailable: false }); // TODO keep updateAvailable if any ?
+			updateLoggingForWorker(registration.installing);
+			updateLoggingForWorker(registration.waiting);
+			updateLoggingForWorker(registration.active);
+			listenForWaitingServiceWorker(registration, () => {
+				console.log('[Service Worker] Update found');
+				serviceWorker.set({ registration, updateAvailable: true });
 			});
-	});
+		})
+		.catch((e) => {
+			console.log(e);
+			// console.error('Failed to register service worker', e);
+		});
 }

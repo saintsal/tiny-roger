@@ -112,7 +112,7 @@ importers:
       svelte: ^3.54.0
       svelte-check: ^3.0.1
       svelte-preprocess: ^4.10.7
-      sveltejs-adapter-ipfs: ^0.4.8
+      sveltejs-adapter-ipfs: ^0.4.12
       tailwindcss: ^3.1.5
       theme-change: ^2.3.0
       tslib: ^2.4.1
@@ -137,7 +137,7 @@ importers:
       svelte: 3.55.1
       svelte-check: 3.0.3_gqx7lw3sljhsd4bstor5m2aa2u
       svelte-preprocess: 4.10.7_b25a55hc532q56kmuqlrolam2i
-      sveltejs-adapter-ipfs: 0.4.8_@sveltejs+kit@1.8.3
+      sveltejs-adapter-ipfs: 0.4.12_@sveltejs+kit@1.8.3
       tailwindcss: 3.2.6_postcss@8.4.21
       tslib: 2.5.0
       typescript: 4.9.5
@@ -7872,8 +7872,8 @@ packages:
     engines: {node: '>= 8'}
     dev: true
 
-  /sveltejs-adapter-ipfs/0.4.8_@sveltejs+kit@1.8.3:
-    resolution: {integrity: sha512-nKZc2TmrhEhUT9ESgLdn9IvPi66n2SbOYlhqf4MsOhsq8hmjCuYifZC1EDkHUTl95jf6eGrjORYdXd5ocNtcuQ==}
+  /sveltejs-adapter-ipfs/0.4.12_@sveltejs+kit@1.8.3:
+    resolution: {integrity: sha512-XltyQ63yYcX01MEbCZESHlW+wrNOkBmbFvy1NbHJYSrN18OFvUl8rdJZFFTvHJlI4pyidP57eSed/PXvmhH3Mw==}
     peerDependencies:
       '@sveltejs/kit': ^1.5.0
     dependencies:
