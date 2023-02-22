@@ -94,6 +94,14 @@ importers:
       tsup: 6.2.3_typescript@4.8.4
       typescript: 4.8.4
 
+  packages/1193:
+    specifiers:
+      typescript: ^4.9.3
+      vite: ^4.1.0
+    devDependencies:
+      typescript: 4.9.5
+      vite: 4.1.1
+
   web:
     specifiers:
       '@sveltejs/adapter-static': ^2.0.1

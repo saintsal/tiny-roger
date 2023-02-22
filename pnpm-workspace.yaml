@@ -2,3 +2,4 @@ packages:
   - "contracts"
   - "indexer"
   - "web"
+  - "packages/*"
