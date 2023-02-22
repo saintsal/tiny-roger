@@ -11,6 +11,10 @@
 		appleStatusBarStyle,
 		ENSName,
 	} from 'web-config';
+	import NewVersionNotification from '$lib/components/web/NewVersionNotification.svelte';
+	import NoInstallPrompt from '$lib/components/web/NoInstallPrompt.svelte';
+	import { url } from '$lib/utils/url';
+	import Install from '$lib/components/web/Install.svelte';
 
 	const host = canonicalURL.endsWith('/') ? canonicalURL : canonicalURL + '/';
 	const previewImage = host + 'preview.png';
@@ -65,6 +69,13 @@
 		<ThemeChanger />
 	</div>
 </div>
+
+<!-- Disable native prompt from browsers -->
+<!-- <NoInstallPrompt /> -->
+<!-- Add Your Own Install Prompt-->
+<Install src={url('/icon.svg')} alt="Jolly Roger" />
+<!-- Notifications for new version -->
+<NewVersionNotification src={url('/icon.svg')} alt="Jolly Roger" />
 
 <!-- use -my-20 to ensure the navbar is considered when using min-h-screen to offset the footer (when content is too small)-->
 <div class="-my-20 flex flex-col min-h-screen justify-between">

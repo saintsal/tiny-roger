@@ -2,6 +2,7 @@ import type { Logger } from 'named-logs';
 import { logs } from 'named-logs';
 import { serviceWorker } from '$lib/web/serviceWorker';
 import { base } from '$app/paths';
+import { dev } from '$app/environment';
 
 const console = logs('service-worker') as Logger & { level: number; enabled: boolean };
 function updateLoggingForWorker(worker: ServiceWorker | null) {
@@ -59,7 +60,7 @@ function listenForWaitingServiceWorker(
 	}
 }
 
-if (typeof navigator !== 'undefined' && 'serviceWorker' in navigator) {
+if (!dev && typeof navigator !== 'undefined' && 'serviceWorker' in navigator) {
 	// ------------------------------------------------------------------------------------------------
 	// FORCE RELOAD ON CONTROLLER CHANGE
 	// ------------------------------------------------------------------------------------------------

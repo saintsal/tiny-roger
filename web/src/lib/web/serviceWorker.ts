@@ -15,3 +15,7 @@ export const serviceWorker = {
 		return get(store).updateAvailable;
 	},
 };
+
+// allow to test service worker notifcation by executing the following in the console:
+// serviceWorker.update(v => {v.updateAvailable = true; v.registration = "anything"; return v});
+(globalThis as any).serviceWorker = store;
