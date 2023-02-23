@@ -11,6 +11,10 @@ export function fetchEthereum(window: Window): Promise<EIP1193Provider | undefin
 	const document = window.document;
 	// TODO test with document.readyState !== 'complete' || document.readyState === 'interactive'
 	return new Promise((resolve) => {
+		const ethereum = getEthereum(window);
+		if (ethereum) {
+			return resolve(ethereum);
+		}
 		if (document.readyState !== 'complete') {
 			document.onreadystatechange = function () {
 				if (document.readyState === 'complete') {

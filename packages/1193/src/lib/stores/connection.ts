@@ -5,6 +5,7 @@ import { createStore } from '$lib/utils/stores';
 import { createBuiltinStore } from './builtin';
 import { logs } from 'named-logs';
 import { wait } from '$lib/utils/time';
+import { browser } from '$app/environment';
 const logger = logs('1193-connection');
 
 export type ConnectionState = {
@@ -22,6 +23,7 @@ export type ConnectionState = {
 	listenning?: boolean;
 	walletName?: string;
 	requireSelection?: boolean;
+	initialised: boolean; // to avoid flash by not displaying connect button until this is executed
 	toJSON(): Partial<ConnectionState>;
 };
 
@@ -35,6 +37,14 @@ function recordSelection(type: string) {
 	try {
 		localStorage.setItem(LOCAL_STORAGE_PREVIOUS_WALLET_SLOT, type);
 	} catch (e) {}
+}
+
+function fetchPreviousSelection() {
+	try {
+		return localStorage.getItem(LOCAL_STORAGE_PREVIOUS_WALLET_SLOT);
+	} catch (e) {
+		return null;
+	}
 }
 
 export function init(config: ConnectionConfig) {
@@ -54,6 +64,7 @@ export function init(config: ConnectionConfig) {
 		}),
 		connecting: false,
 		unlocking: false,
+		initialised: false,
 
 		toJSON(): Partial<ConnectionState> {
 			return {
@@ -69,6 +80,7 @@ export function init(config: ConnectionConfig) {
 				listenning: $state.listenning,
 				walletName: $state.walletName,
 				requireSelection: $state.requireSelection,
+				initialised: $state.initialised,
 			};
 		},
 	});
@@ -190,12 +202,12 @@ export function init(config: ConnectionConfig) {
 				throw new Error(message);
 			} // TODO other type: check if module registered
 
+			set({ connecting: true });
 			if (typeOrModule === 'builtin') {
 				const provider = await builtin.probe();
 				set({
 					requireSelection: false,
 					address: undefined,
-					connecting: true,
 					selected: type,
 					state: 'Idle',
 					provider,
@@ -244,7 +256,6 @@ export function init(config: ConnectionConfig) {
 					const { eip1193Provider } = await module.setup(moduleConfig); // TODO pass config in select to choose network
 					set({
 						address: undefined,
-						connecting: true,
 						selected: type,
 						state: 'Idle',
 						walletName: walletName(type),
@@ -350,9 +361,6 @@ export function init(config: ConnectionConfig) {
 					error: undefined,
 				});
 			}
-			if ($state.state === 'Locked') {
-				return unlock();
-			}
 		} catch (err) {
 			set({ connecting: false, error: (err as any).message || err });
 			throw err;
@@ -412,6 +420,9 @@ export function init(config: ConnectionConfig) {
 					})
 					.then(() => {
 						resolve_connect();
+						if ($state.state === 'Locked') {
+							return unlock();
+						}
 					});
 			}
 		});
@@ -492,6 +503,23 @@ export function init(config: ConnectionConfig) {
 		} else {
 			throw new Error(`Not Locked`);
 		}
+	}
+
+	async function autoStart() {
+		const type = fetchPreviousSelection();
+		if (type && type !== '') {
+			await select(type);
+			if ($state.state === 'Locked') {
+				return unlock();
+			}
+		}
+	}
+
+	if (browser) {
+		// if (config.autoSelectPrevious) {
+		autoStart();
+		// }
+		set({ initialised: true });
 	}
 
 	return {
