@@ -21,6 +21,7 @@ export type ConnectionState = {
 	error?: { title?: string; message: string; code: number };
 	listenning?: boolean;
 	walletName?: string;
+	requireSelection?: boolean;
 	toJSON(): Partial<ConnectionState>;
 };
 
@@ -67,6 +68,7 @@ export function init(config: ConnectionConfig) {
 				error: $state.error,
 				listenning: $state.listenning,
 				walletName: $state.walletName,
+				requireSelection: $state.requireSelection,
 			};
 		},
 	});
@@ -159,191 +161,201 @@ export function init(config: ConnectionConfig) {
 	}
 
 	async function select(type: string, moduleConfig?: any) {
-		if ($state.selected && ($state.state === 'Ready' || $state.state === 'Locked')) {
-			// disconnect first
-			await disconnect();
-		}
+		try {
+			if ($state.selected && ($state.state === 'Ready' || $state.state === 'Locked')) {
+				// disconnect first
+				await disconnect();
+			}
 
-		let typeOrModule: string | Web3WModule | Web3WModuleLoader = type;
+			let typeOrModule: string | Web3WModule | Web3WModuleLoader = type;
 
-		if (!typeOrModule) {
-			if (options.length === 0) {
-				typeOrModule = 'builtin';
-			} else if (options.length === 1) {
-				typeOrModule = options[0];
-			} else {
-				const message = `No Wallet Type Specified, choose from ${$state.options}`;
+			if (!typeOrModule) {
+				if (options.length === 0) {
+					typeOrModule = 'builtin';
+				} else if (options.length === 1) {
+					typeOrModule = options[0];
+				} else {
+					const message = `No Wallet Type Specified, choose from ${$state.options}`;
+					// set(walletStore, {error: {message, code: 1}}); // TODO code
+					throw new Error(message);
+				}
+			}
+			if (
+				typeOrModule == 'builtin' &&
+				builtin.$state.state === 'Ready' &&
+				!builtin.$state.available
+			) {
+				const message = `No Builtin Wallet`;
 				// set(walletStore, {error: {message, code: 1}}); // TODO code
 				throw new Error(message);
-			}
-		}
-		if (
-			typeOrModule == 'builtin' &&
-			builtin.$state.state === 'Ready' &&
-			!builtin.$state.available
-		) {
-			const message = `No Builtin Wallet`;
-			// set(walletStore, {error: {message, code: 1}}); // TODO code
-			throw new Error(message);
-		} // TODO other type: check if module registered
+			} // TODO other type: check if module registered
 
-		if (typeOrModule === 'builtin') {
-			const provider = await builtin.probe();
-			set({
-				address: undefined,
-				connecting: true,
-				selected: type,
-				state: 'Idle',
-				provider,
-				currentModule: undefined,
-				walletName: walletName(type),
-				error: undefined,
-			});
-		} else {
-			let module: Web3WModule | Web3WModuleLoader | undefined;
-			if (typeof typeOrModule === 'string') {
-				if (options) {
-					for (const choice of options) {
-						if (typeof choice !== 'string' && choice.id === type) {
-							module = choice;
-						}
-					}
-				}
-			} else {
-				module = typeOrModule;
-				type = module.id;
-			}
-
-			if (!module) {
-				const message = `no module found: ${type}`;
+			if (typeOrModule === 'builtin') {
+				const provider = await builtin.probe();
 				set({
-					error: { message, code: 1 },
-					selected: undefined,
-					walletName: undefined,
-					connecting: false,
-				}); // TODO code
-				throw new Error(message);
-			}
-
-			try {
-				if ('load' in module) {
-					// if (module.loaded) {
-					//   module = module.loaded;
-					// } else {
-					set({ loadingModule: true });
-					module = await module.load();
-					set({ loadingModule: false });
-					// }
-				}
-				logger.log(`setting up module`);
-				const { eip1193Provider } = await module.setup(moduleConfig); // TODO pass config in select to choose network
-				set({
+					requireSelection: false,
 					address: undefined,
 					connecting: true,
 					selected: type,
 					state: 'Idle',
+					provider,
+					currentModule: undefined,
 					walletName: walletName(type),
-					provider: eip1193Provider,
-					currentModule: module,
 					error: undefined,
 				});
-				logger.log(`module setup`);
-			} catch (err) {
-				if ((err as any).message === 'USER_CANCELED') {
-					set({
-						connecting: false,
-						selected: undefined,
-						walletName: undefined,
-						loadingModule: false,
-					});
+			} else {
+				let module: Web3WModule | Web3WModuleLoader | undefined;
+				if (typeof typeOrModule === 'string') {
+					if (options) {
+						for (const choice of options) {
+							if (typeof choice !== 'string' && choice.id === type) {
+								module = choice;
+							}
+						}
+					}
 				} else {
-					set({
-						error: { code: MODULE_ERROR, message: (err as any).message },
-						selected: undefined,
-						walletName: undefined,
-						connecting: false,
-						loadingModule: false,
-					});
+					module = typeOrModule;
+					type = module.id;
 				}
-				throw err;
-			}
-		}
 
-		if (!$state.provider) {
-			const message = `no provider found for wallet type ${type}`;
-			set({
-				error: { message, code: 1 }, // TODO code
-				selected: undefined,
-				walletName: undefined,
-				connecting: false,
-			});
-			throw new Error(message);
-		}
+				if (!module) {
+					const message = `no module found: ${type}`;
+					set({
+						requireSelection: false,
+						error: { message, code: 1 },
+						selected: undefined,
+						walletName: undefined,
+						connecting: false,
+					}); // TODO code
+					throw new Error(message);
+				}
 
-		// TODO ?
-		// listenForConnection();
-
-		let accounts: string[];
-		try {
-			// TODO Metamask ?
-			// if (type === 'builtin' && builtin.$state.vendor === 'Metamask') {
-			// 	accounts = await timeout(4000, _ethersProvider.listAccounts(), {
-			// 		error: `Metamask timed out. Please reload the page (see <a href="https://github.com/MetaMask/metamask-extension/issues/7221">here</a>)`,
-			// 	}); // TODO timeout checks (Metamask, Portis)
-			// } else {
-			// TODO timeout warning
-			logger.log(`fetching accounts...`);
-			try {
-				accounts = await $state.provider.request({ method: 'eth_accounts' });
-			} catch (err) {
-				const errWithCode = err as { code: number; message: string };
-				if (errWithCode.code === 4100) {
-					logger.log(`4100 ${errWithCode.message || (errWithCode as any).name}`); // TOCHECK why name here ?
-					// status-im throw such error if eth_requestAccounts was not called first
-					accounts = [];
-				} else if (errWithCode.code === -32500 && errWithCode.message === 'permission denied') {
-					// TODO Opera
-					// if (builtin.$state.vendor === 'Opera') {
-					// 	logger.log(`permission denied (opera) crypto wallet not enabled?)`);
-					// } else {
-					// 	logger.log(`permission denied`);
-					// }
-					accounts = [];
-				} else if (errWithCode.code === 4001) {
-					// "No Frame account selected" (frame.sh)
-					accounts = [];
-				} else {
+				try {
+					if ('load' in module) {
+						// if (module.loaded) {
+						//   module = module.loaded;
+						// } else {
+						set({ loadingModule: true });
+						module = await module.load();
+						set({ loadingModule: false });
+						// }
+					}
+					logger.log(`setting up module`);
+					const { eip1193Provider } = await module.setup(moduleConfig); // TODO pass config in select to choose network
+					set({
+						address: undefined,
+						connecting: true,
+						selected: type,
+						state: 'Idle',
+						walletName: walletName(type),
+						provider: eip1193Provider,
+						currentModule: module,
+						error: undefined,
+					});
+					logger.log(`module setup`);
+				} catch (err) {
+					if ((err as any).message === 'USER_CANCELED') {
+						set({
+							connecting: false,
+							selected: undefined,
+							walletName: undefined,
+							loadingModule: false,
+						});
+					} else {
+						set({
+							error: { code: MODULE_ERROR, message: (err as any).message },
+							selected: undefined,
+							walletName: undefined,
+							connecting: false,
+							loadingModule: false,
+						});
+					}
 					throw err;
 				}
 			}
-			logger.log(`accounts: ${accounts}`);
-			// }
+
+			if (!$state.provider) {
+				const message = `no provider found for wallet type ${type}`;
+				set({
+					error: { message, code: 1 }, // TODO code
+					selected: undefined,
+					walletName: undefined,
+					connecting: false,
+				});
+				throw new Error(message);
+			}
+
+			// TODO ?
+			// listenForConnection();
+
+			let accounts: string[];
+			try {
+				// TODO Metamask ?
+				// if (type === 'builtin' && builtin.$state.vendor === 'Metamask') {
+				// 	accounts = await timeout(4000, _ethersProvider.listAccounts(), {
+				// 		error: `Metamask timed out. Please reload the page (see <a href="https://github.com/MetaMask/metamask-extension/issues/7221">here</a>)`,
+				// 	}); // TODO timeout checks (Metamask, Portis)
+				// } else {
+				// TODO timeout warning
+				logger.log(`fetching accounts...`);
+				try {
+					accounts = await $state.provider.request({ method: 'eth_accounts' });
+				} catch (err) {
+					const errWithCode = err as { code: number; message: string };
+					if (errWithCode.code === 4100) {
+						logger.log(`4100 ${errWithCode.message || (errWithCode as any).name}`); // TOCHECK why name here ?
+						// status-im throw such error if eth_requestAccounts was not called first
+						accounts = [];
+					} else if (errWithCode.code === -32500 && errWithCode.message === 'permission denied') {
+						// TODO Opera
+						// if (builtin.$state.vendor === 'Opera') {
+						// 	logger.log(`permission denied (opera) crypto wallet not enabled?)`);
+						// } else {
+						// 	logger.log(`permission denied`);
+						// }
+						accounts = [];
+					} else if (errWithCode.code === 4001) {
+						// "No Frame account selected" (frame.sh)
+						accounts = [];
+					} else {
+						throw err;
+					}
+				}
+				logger.log(`accounts: ${accounts}`);
+				// }
+			} catch (err) {
+				const errWithCode = err as { code: number; message: string };
+				set({ error: errWithCode, selected: undefined, walletName: undefined, connecting: false });
+				throw err;
+			}
+			logger.debug({ accounts });
+			recordSelection(type);
+			const address = accounts && accounts[0];
+			if (address) {
+				set({
+					address,
+					state: 'Ready',
+					connecting: undefined,
+					error: undefined,
+				});
+				listenForChanges();
+				logger.log('SETUP_CHAIN from select');
+				// await setupChain(address, false);
+			} else {
+				listenForChanges();
+				set({
+					address: undefined,
+					state: 'Locked',
+					connecting: undefined,
+					error: undefined,
+				});
+			}
+			if ($state.state === 'Locked') {
+				return unlock();
+			}
 		} catch (err) {
-			const errWithCode = err as { code: number; message: string };
-			set({ error: errWithCode, selected: undefined, walletName: undefined, connecting: false });
+			set({ connecting: false, error: (err as any).message || err });
 			throw err;
-		}
-		logger.debug({ accounts });
-		recordSelection(type);
-		const address = accounts && accounts[0];
-		if (address) {
-			set({
-				address,
-				state: 'Ready',
-				connecting: undefined,
-				error: undefined,
-			});
-			listenForChanges();
-			logger.log('SETUP_CHAIN from select');
-			// await setupChain(address, false);
-		} else {
-			listenForChanges();
-			set({
-				address: undefined,
-				state: 'Locked',
-				connecting: undefined,
-				error: undefined,
-			});
 		}
 	}
 
@@ -357,18 +369,55 @@ export function init(config: ConnectionConfig) {
 		});
 	}
 
-	async function connect(type: string, moduleConfig?: unknown): Promise<boolean> {
-		set({ connecting: true });
-		try {
-			await select(type, moduleConfig);
-			if ($state.state === 'Locked') {
-				return unlock();
-			}
-			return true;
-		} catch (err) {
-			set({ connecting: false, error: (err as any).message || err });
-			throw err;
+	let connect_resolve: (() => void) | undefined;
+	let connect_reject: ((err: unknown) => void) | undefined;
+	function resolve_connect() {
+		const resolve = connect_resolve;
+		connect_resolve = undefined;
+		connect_reject = undefined;
+		if (resolve) {
+			resolve();
 		}
+	}
+	function reject_connect(err: unknown) {
+		const reject = connect_reject;
+		connect_resolve = undefined;
+		connect_reject = undefined;
+		if (reject) {
+			reject(err);
+		}
+	}
+	function connect(): Promise<void> {
+		return new Promise<void>((resolve, reject) => {
+			let type: string | undefined;
+			if (!type) {
+				if ($state.options.length === 0) {
+					type = 'builtin';
+				} else if ($state.options.length === 1) {
+					type = $state.options[0];
+				}
+			}
+			if (!type) {
+				set({ connecting: true, requireSelection: true });
+				connect_resolve = resolve;
+				connect_reject = reject;
+			} else {
+				set({ connecting: true });
+				select(type)
+					.catch((err) => {
+						reject_connect(err);
+						throw err;
+					})
+					.then(() => {
+						resolve_connect();
+					});
+			}
+		});
+	}
+
+	function cancel() {
+		set({ requireSelection: false, connecting: false });
+		resolve_connect();
 	}
 
 	function walletName(type: string): string | undefined {
@@ -398,7 +447,7 @@ export function init(config: ConnectionConfig) {
 								},
 							});
 							// we ignore the error
-							return false;
+							return;
 						}
 						break;
 					case 'Brave':
@@ -414,7 +463,7 @@ export function init(config: ConnectionConfig) {
 								},
 							});
 							// we ignore the error
-							return false;
+							return;
 						}
 						break;
 				}
@@ -435,9 +484,9 @@ export function init(config: ConnectionConfig) {
 			} else {
 				set({ unlocking: false });
 
-				return false;
+				return;
 			}
-			return true;
+			return;
 		} else {
 			throw new Error(`Not Locked`);
 		}
@@ -445,7 +494,10 @@ export function init(config: ConnectionConfig) {
 
 	return {
 		...readable,
+		builtin,
 		connect,
+		select,
+		cancel,
 		disconnect,
 		unlock,
 	};
