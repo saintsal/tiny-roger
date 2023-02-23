@@ -6,6 +6,7 @@ import { createBuiltinStore } from './builtin';
 import { logs } from 'named-logs';
 import { wait } from '$lib/utils/time';
 import { browser } from '$app/environment';
+import { formatChainId } from '$lib/utils/ethereum';
 const logger = logs('1193-connection');
 
 export type ConnectionState = {
@@ -20,9 +21,9 @@ export type ConnectionState = {
 	selected?: string;
 	currentModule?: Web3WModule;
 	error?: { title?: string; message: string; code: number };
-	listenning?: boolean;
+	listenning: boolean;
 	walletName?: string;
-	requireSelection?: boolean;
+	requireSelection: boolean;
 	initialised: boolean; // to avoid flash by not displaying connect button until this is executed
 	toJSON(): Partial<ConnectionState>;
 };
@@ -63,6 +64,8 @@ export function init(config: ConnectionConfig) {
 			return m;
 		}),
 		connecting: false,
+		listenning: false,
+		requireSelection: false,
 		unlocking: false,
 		initialised: false,
 
@@ -97,7 +100,7 @@ export function init(config: ConnectionConfig) {
 			}
 			chainId = await $state.provider.request({ method: 'eth_chainId' });
 		}
-		const chainIdAsDecimal = parseInt(chainId.slice(2), 16).toString();
+		const chainIdAsDecimal = formatChainId(chainId);
 		if (hasChainChanged(chainIdAsDecimal)) {
 			logger.debug('onChainChanged', { chainId, chainIdAsDecimal });
 			set({ chainId: chainIdAsDecimal });
@@ -170,6 +173,16 @@ export function init(config: ConnectionConfig) {
 			$state.provider.removeListener('accountsChanged', onAccountsChanged);
 			set({ listenning: false });
 		}
+	}
+
+	async function fetchChainId() {
+		try {
+			const chainId = await $state.provider?.request({ method: 'eth_chainId' });
+			if (chainId) {
+				const chainIdAsDecimal = formatChainId(chainId);
+				set({ chainId: chainIdAsDecimal });
+			}
+		} catch (e) {}
 	}
 
 	async function select(type: string, moduleConfig?: any) {
@@ -341,12 +354,13 @@ export function init(config: ConnectionConfig) {
 			}
 			logger.debug({ accounts });
 			recordSelection(type);
+			fetchChainId();
 			const address = accounts && accounts[0];
 			if (address) {
 				set({
 					address,
 					state: 'Ready',
-					connecting: undefined,
+					connecting: false,
 					error: undefined,
 				});
 				listenForChanges();
@@ -357,7 +371,7 @@ export function init(config: ConnectionConfig) {
 				set({
 					address: undefined,
 					state: 'Locked',
-					connecting: undefined,
+					connecting: false,
 					error: undefined,
 				});
 			}
@@ -373,6 +387,7 @@ export function init(config: ConnectionConfig) {
 			connecting: false,
 			error: undefined,
 			selected: undefined,
+			chainId: undefined,
 			state: 'Idle',
 		});
 	}
