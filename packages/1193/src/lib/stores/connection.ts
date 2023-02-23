@@ -509,9 +509,6 @@ export function init(config: ConnectionConfig) {
 		const type = fetchPreviousSelection();
 		if (type && type !== '') {
 			await select(type);
-			if ($state.state === 'Locked') {
-				return unlock();
-			}
 		}
 	}
 
