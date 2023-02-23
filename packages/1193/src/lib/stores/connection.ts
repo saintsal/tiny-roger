@@ -12,21 +12,31 @@ import { wrapProvider } from '$lib/provider';
 const logger = logs('1193-connection');
 
 export type ConnectionState = {
-	state: 'Idle' | 'Locked' | 'Ready';
-	connecting: boolean;
-	unlocking: boolean;
-	loadingModule?: boolean;
-	provider?: EIP1193Provider;
-	chainId?: string;
-	address?: string;
-	options: string[];
-	selected?: string;
-	currentModule?: Web3WModule;
-	error?: { title?: string; message: string; code: number };
-	listenning: boolean;
-	walletName?: string;
-	requireSelection: boolean;
-	initialised: boolean; // to avoid flash by not displaying connect button until this is executed
+	state: 'Idle' | 'Locked' | 'Ready'; // should remains the same once connected
+
+	options: string[]; // should remains the same once initialised // does it need to be exposed this way ? we can use .options from the store object ?
+
+	initialised: boolean; // should remains the same once initialised // used to avoid flash by not displaying connect button until this is executed
+
+	connecting: boolean; // transient
+	requireSelection: boolean; // transiant
+	loadingModule?: boolean; // transient
+	unlocking: boolean; // transient
+
+	error?: { title?: string; message: string; code: number }; // transient
+
+	selected?: string; // should remains the same once connected // TODO rename to walletTypeSelected ?, do we need walletName ?
+	walletName?: string; // should remains the same once connected // TODO rename to walletNameSelected ?, is it needed of can we have it as part of "selected" call walletSelected ? ?
+	currentModule?: Web3WModule; // should remains the same once connected (does not need to be exposed)
+	listenning: boolean; // should remains the same once connected (does not need to be exposed)
+
+	provider?: EIP1193Provider; // should remains the same once connected // does it need to be exposed ? // maybe for derived store ? but even they can use after changed from Idle to Locked/Ready
+	// regarding Locked, we can make it a variable ? and let be only 2 state : `Disconnected` | `Connected`
+	// this would require a complex use of variable though on the UI as you would have `unlocking` + `locked`
+
+	chainId?: string; // extract it out as we expect this to change /////////////////
+	address?: string; // extract it out as we expect this to change /////////////////
+
 	toJSON(): Partial<ConnectionState>;
 };
 
