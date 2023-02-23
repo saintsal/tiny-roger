@@ -3,8 +3,7 @@
 
 	import Web3Connection from '$test/Web3Connection.svelte';
 	import { connection } from '../app/web3';
-	import InlineAlert from '$test/InlineInfo.svelte';
-	import Alert from '$test/Alert.svelte';
+	import InlineInfo from '$test/InlineInfo.svelte';
 </script>
 
 <Web3Connection {connection} />
@@ -18,10 +17,11 @@
 	>
 {:else if $connection.state === 'Locked'}
 	{#if $connection.unlocking}
-		<Alert
+		<!-- <Alert
 			data={{ message: 'if the wallet unlock screen did not popup, please refers to its menus.' }}
 			bgBorderText="bg-warning border-warning-content text-warning-content"
-		/>
+		/> -->
+		<InlineInfo>if the wallet unlock screen did not popup, please refers to its menus.</InlineInfo>
 	{/if}
 	<button
 		class="m-2 btn btn-primary"

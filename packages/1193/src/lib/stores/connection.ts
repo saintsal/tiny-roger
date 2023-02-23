@@ -536,6 +536,9 @@ export function init(config: ConnectionConfig) {
 
 	return {
 		...readable,
+		acknowledgeError() {
+			set({ error: undefined, unlocking: false });
+		},
 		builtin,
 		connect,
 		select,
