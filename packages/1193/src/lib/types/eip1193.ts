@@ -65,14 +65,26 @@ export interface EIP1193EthSubscription extends EIP1193ProviderMessage {
 	};
 }
 
-export type EIP1193TransactionData = {
-	from: string;
-	to?: string;
+type EIP1193BaseTransactionData = {
 	gas?: string;
 	gasPrice?: string;
 	value?: string;
 	data?: string;
 	nonce?: string;
+};
+
+export type EIP1193TransactionData =
+	| EIP1193NormalTransactionData
+	| EIP1193TransactionContractCreationData;
+
+export type EIP1193NormalTransactionData = EIP1193BaseTransactionData & {
+	from: string;
+	to: string;
+};
+
+export type EIP1193TransactionContractCreationData = EIP1193BaseTransactionData & {
+	from: string;
+	data: string;
 };
 
 export interface EIP1193ProviderConnectInfo {

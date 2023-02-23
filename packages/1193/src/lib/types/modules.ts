@@ -7,7 +7,10 @@ export type Web3WModuleLoader = {
 
 export type Web3WModule = {
 	id: string;
-	setup(options?: unknown): Promise<{ chainId: string; eip1193Provider: EIP1193Provider }>;
+	setup(options?: unknown): Promise<
+		| { chainId: string; eip1193Provider: EIP1193Provider }
+		| { chainId: string; web3Provider: EIP1193Provider } // backward compatibility
+	>;
 	logout(): Promise<void>;
 	disconnect(): void;
 };

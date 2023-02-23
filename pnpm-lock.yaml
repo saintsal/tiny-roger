@@ -116,6 +116,7 @@ importers:
       tslib: ^2.4.1
       typescript: ^4.9.3
       vite: ^4.0.0
+      web3w-portis-loader: ^0.3.3
     dependencies:
       named-logs: 0.2.1
     devDependencies:
@@ -138,6 +139,7 @@ importers:
       tslib: 2.5.0
       typescript: 4.9.5
       vite: 4.1.1
+      web3w-portis-loader: 0.3.3
 
   web:
     specifiers:
@@ -5966,6 +5968,10 @@ packages:
       named-logs: 0.2.0
     dev: true
 
+  /named-logs/0.1.0:
+    resolution: {integrity: sha512-BH/I7iUfuL+FR9QmNUT1wUK/JC53qUogrCEv3XGVCHrlQ9hqRrLNakfE5BQbjXPC2A6Kb0whw9BkU+A7nhYKOg==}
+    dev: true
+
   /named-logs/0.2.0:
     resolution: {integrity: sha512-XQN0OQyDhGlUnZxwFJ+whi7Wju3AOrNh/MXoY+gzXYuX2Dyqn8fQ7kz+1YgXn5PIYLQHx9WkTce/sQBdInn24Q==}
 
@@ -8691,6 +8697,12 @@ packages:
       number-to-bn: 1.7.0
       randombytes: 2.1.0
       utf8: 3.0.0
+    dev: true
+
+  /web3w-portis-loader/0.3.3:
+    resolution: {integrity: sha512-k0Pg9B0rTKkuS9qF91VGGklId8wmleLYXIu80FhrtdxxoipRU8YSgGquxj52uCEw6PYBxM2HUwcRPqlwRnvAcA==}
+    dependencies:
+      named-logs: 0.1.0
     dev: true
 
   /webidl-conversions/3.0.1:

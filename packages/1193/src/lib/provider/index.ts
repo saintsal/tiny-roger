@@ -72,7 +72,7 @@ export function wrapProvider(
 		}
 
 		try {
-			const signature = (await ethereum.request(args)) as string;
+			const signature = (await _request(args)) as string;
 
 			if (currentObservers?.onSignatureResponse) {
 				currentObservers?.onSignatureResponse({ ...messageWithMetadata, signature });
@@ -101,12 +101,97 @@ export function wrapProvider(
 		}
 	}
 
+	function _request(args: EIP1193Request): Promise<unknown> {
+		if (ethereum.request) {
+			return ethereum.request(args);
+		} else {
+			const ethereumSendAsync = ethereum as unknown as {
+				sendAsync: (
+					request: { method: string; params?: Array<any> },
+					callback: (error: any, response: any) => void
+				) => void;
+				enable?(): Promise<unknown>;
+			};
+			const ethereumSend = ethereum as unknown as {
+				send: (
+					request: { method: string; params?: Array<any> },
+					callback: (error: any, response: any) => void
+				) => void;
+				enable?(): Promise<unknown>;
+			};
+			if (ethereumSendAsync.sendAsync) {
+				return new Promise<unknown>((resolve, reject) => {
+					if (args.method === 'eth_requestAccounts' && ethereumSendAsync.enable) {
+						ethereumSendAsync.enable().then(resolve);
+					} else {
+						ethereumSendAsync.sendAsync(args, (error: any, response: unknown) => {
+							if (error) {
+								reject(error);
+							} else {
+								resolve(
+									(response as any).id && (response as any).result
+										? (response as any).result
+										: response
+								);
+							}
+						});
+					}
+				});
+			} else if (ethereumSend.send) {
+				return new Promise<unknown>((resolve, reject) => {
+					if (args.method === 'eth_requestAccounts' && ethereumSendAsync.enable) {
+						ethereumSendAsync.enable().then(resolve);
+					} else {
+						ethereumSend.send(args, (error: any, response: unknown) => {
+							if (error) {
+								reject(error);
+							} else {
+								resolve(
+									(response as any).id && (response as any).result
+										? (response as any).result
+										: response
+								);
+							}
+						});
+					}
+				});
+			} else {
+				return Promise.reject();
+			}
+
+			// const ethereumSendAsync = ethereum as unknown as {
+			// 	sendAsync(request: Object, callback: Function): void;
+			// };
+			// const ethereumSend = ethereum as unknown as {
+			// 	send(method: String, params: any[]): Promise<unknown>;
+			// };
+			// if (ethereumSendAsync.sendAsync) {
+			// 	return new Promise<unknown>((resolve, reject) => {
+			// 		ethereumSendAsync.sendAsync(args, (response: unknown, error: any) => {
+			// 			if (error) {
+			// 				reject(error);
+			// 			} else {
+			// 				resolve(response);
+			// 			}
+			// 		});
+			// 	});
+			// } else if (ethereumSend.send) {
+			// 	return ethereumSend.send(args.method, (args as any).params || []).then((v) => {
+			// 		console.log({ v });
+			// 		return v;
+			// 	});
+			// } else {
+			// 	return Promise.reject();
+			// }
+		}
+	}
+
 	async function request(args: EIP1193Request) {
 		switch (args.method) {
 			case 'eth_sendTransaction':
 				const tx = args.params[0];
 				const metadata = getMetadata(
-					(tx as unknown as EIP1193TransactionRequestWithMetadata).params[1]
+					(args as unknown as EIP1193TransactionRequestWithMetadata).params[1]
 				);
 
 				let txWithMetadata = { ...tx, metadata };
@@ -116,10 +201,10 @@ export function wrapProvider(
 				}
 
 				try {
-					const hash = await ethereum.request({ method: args.method, params: [tx] });
+					const hash = await _request({ method: args.method, params: [tx] });
 
 					if (currentObservers?.onTxSent) {
-						currentObservers?.onTxSent({ ...txWithMetadata, hash });
+						currentObservers?.onTxSent({ ...txWithMetadata, hash: hash as string });
 					}
 
 					return hash;
@@ -160,7 +245,7 @@ export function wrapProvider(
 				);
 		}
 
-		return ethereum.request(args);
+		return _request(args);
 	}
 
 	function setNextMetadata(metadata: any) {

@@ -127,7 +127,9 @@ export function init(config: ConnectionConfig) {
 			let accounts: string[] = [];
 			try {
 				accounts = await $state.provider.request({ method: 'eth_accounts' });
-			} catch (e) {}
+			} catch (err) {
+				logger.error(err);
+			}
 
 			// logger.debug({ accounts }); // TODO remove
 			if (hasAccountsChanged(accounts)) {
@@ -287,13 +289,17 @@ export function init(config: ConnectionConfig) {
 						// }
 					}
 					logger.log(`setting up module`);
-					const { eip1193Provider } = await module.setup(moduleConfig); // TODO pass config in select to choose network
+					const moduleSetup = await module.setup(moduleConfig); // TODO pass config in select to choose network
 					set({
 						address: undefined,
 						selected: type,
 						state: 'Idle',
 						walletName: walletName(type),
-						provider: wrapProvider(eip1193Provider, {}), // TODO observers
+						chainId: moduleSetup.chainId,
+						provider: wrapProvider(
+							(moduleSetup as any).eip1193Provider || (moduleSetup as any).web3Provider,
+							{}
+						), // TODO observers
 						currentModule: module,
 						error: undefined,
 					});
@@ -409,8 +415,13 @@ export function init(config: ConnectionConfig) {
 			error: undefined,
 			selected: undefined,
 			chainId: undefined,
+			address: undefined,
+			provider: undefined,
+			currentModule: undefined,
+			walletName: undefined,
 			state: 'Idle',
 		});
+		recordSelection('');
 	}
 
 	let connect_resolve: (() => void) | undefined;
