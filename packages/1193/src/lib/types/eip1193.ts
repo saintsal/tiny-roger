@@ -15,7 +15,7 @@ export interface EIP1193ProviderMessage {
 }
 
 export interface EIP1193EthSubscription extends EIP1193ProviderMessage {
-	readonly type: "eth_subscription";
+	readonly type: 'eth_subscription';
 	readonly data: {
 		readonly subscription: string;
 		readonly result: unknown;
@@ -34,25 +34,26 @@ export interface EIP1193ProviderConnectInfo {
 4901	Chain Disconnected	The Provider is not connected to the requested chain.
 */
 
-type Listener<Message> = (message: Message) => void;
+type Listener<Message> = (message: Message) => unknown | Promise<unknown>;
 
 export interface EIP1193Provider {
 	on(
-		eventName: "message" | "disconnect" | "chainChanged" | "accountsChanged",
+		eventName: 'message' | 'disconnect',
 		listener: Listener<EIP1193ProviderMessage | EIP1193EthSubscription>
 	): EIP1193Provider;
-	on(
-		eventName: "connect",
-		listener: Listener<EIP1193ProviderConnectInfo>
-	): EIP1193Provider;
+	on(eventName: 'accountsChanged', listener: Listener<string[]>): EIP1193Provider;
+	on(eventName: 'chainChanged', listener: Listener<string>): EIP1193Provider;
+	on(eventName: 'connect', listener: Listener<EIP1193ProviderConnectInfo>): EIP1193Provider;
 	removeListener(
 		eventName: string | symbol,
-		listener: Listener<
-			| EIP1193ProviderMessage
-			| EIP1193EthSubscription
-			| EIP1193ProviderConnectInfo
-		>
+		listener:
+			| Listener<string>
+			| Listener<string[]>
+			| Listener<EIP1193ProviderMessage | EIP1193EthSubscription | EIP1193ProviderConnectInfo>
 	): EIP1193Provider;
+	request(args: { method: 'eth_chainId' }): Promise<string>;
+	request(args: { method: 'eth_accounts' }): Promise<string[]>;
+	request(args: { method: 'eth_requestAccounts' }): Promise<string[]>;
 	request(args: EIP1193RequestArguments): Promise<unknown>;
 }
 

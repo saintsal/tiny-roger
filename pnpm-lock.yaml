@@ -99,6 +99,7 @@ importers:
       '@sveltejs/adapter-auto': ^2.0.0
       '@sveltejs/kit': ^1.5.0
       '@sveltejs/package': ^2.0.0
+      named-logs: ^0.2.1
       prettier: ^2.8.0
       prettier-plugin-svelte: ^2.8.1
       publint: ^0.1.9
@@ -107,6 +108,8 @@ importers:
       tslib: ^2.4.1
       typescript: ^4.9.3
       vite: ^4.0.0
+    dependencies:
+      named-logs: 0.2.1
     devDependencies:
       '@sveltejs/adapter-auto': 2.0.0_@sveltejs+kit@1.8.3
       '@sveltejs/kit': 1.8.3_5ikgtkhlzgdgxg3ddmqxgewlsi_svelte@3.55.1+vite@4.1.1
@@ -5949,6 +5952,10 @@ packages:
 
   /named-logs/0.2.0:
     resolution: {integrity: sha512-XQN0OQyDhGlUnZxwFJ+whi7Wju3AOrNh/MXoY+gzXYuX2Dyqn8fQ7kz+1YgXn5PIYLQHx9WkTce/sQBdInn24Q==}
+
+  /named-logs/0.2.1:
+    resolution: {integrity: sha512-iBGMH4/NLNczfWoWjShRCxSM3aOA+ZjkAcr4BSn4RXzfnqh+BjQ1Q/daeoGN9d+0pZANr3ewImr9ald+jyWrSg==}
+    dev: false
 
   /nanoid/3.3.3:
     resolution: {integrity: sha512-p1sjXuopFs0xg+fPASzQ28agW1oHD7xDsd9Xkf3T15H3c/cifrFHVwrh74PdoklAPi+i7MdRsE47vm2r6JoB+w==}

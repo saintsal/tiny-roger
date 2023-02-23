@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { EIP1193Provider, EIP1193ProviderMessage } from '$lib/types';
+	import type { EIP1193Provider } from '$lib/types/eip1193';
 	import { onMount } from 'svelte';
 	let ethereum: EIP1193Provider;
 	let loaded = false;
