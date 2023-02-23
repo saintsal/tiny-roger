@@ -7,8 +7,7 @@
 <Web3Connection {connection} />
 
 {#if $connection.state === 'Idle'}
-	<button class="m-2 btn btn-primary" on:click={() => connection.connect('builtin')}>connect</button
-	>
+	<button class="m-2 btn btn-primary" on:click={() => connection.connect()}>connect</button>
 {:else if $connection.state === 'Locked'}
 	{#if $connection.unlocking}
 		<p>To unlock your wallet, please refers to its menus.</p>
