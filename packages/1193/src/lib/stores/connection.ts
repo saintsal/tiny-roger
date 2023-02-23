@@ -18,8 +18,7 @@ export type ConnectionState = {
 	options: string[];
 	selected?: string;
 	currentModule?: Web3WModule;
-	error?: { message: string; code: number };
-	warningMessage?: string;
+	error?: { title?: string; message: string; code: number };
 	listenning?: boolean;
 	walletName?: string;
 	toJSON(): Partial<ConnectionState>;
@@ -68,7 +67,6 @@ export function init(config: ConnectionConfig) {
 				error: $state.error,
 				listenning: $state.listenning,
 				walletName: $state.walletName,
-				warningMessage: $state.warningMessage,
 			};
 		},
 	});
@@ -129,9 +127,9 @@ export function init(config: ConnectionConfig) {
 		logger.debug('onAccountsChanged', { accounts }); // TODO
 		const address = accounts[0];
 		if (address) {
-			set({ address, state: 'Ready', warningMessage: undefined }); // TODO? error: undefined ?
+			set({ address, state: 'Ready', error: undefined });
 		} else {
-			set({ address: undefined, state: 'Locked', warningMessage: undefined }); // TODO? error: undefined ?
+			set({ address: undefined, state: 'Locked', error: undefined });
 		}
 		// TODO balance ?
 	}
@@ -200,7 +198,6 @@ export function init(config: ConnectionConfig) {
 				currentModule: undefined,
 				walletName: walletName(type),
 				error: undefined,
-				warningMessage: undefined,
 			});
 		} else {
 			let module: Web3WModule | Web3WModuleLoader | undefined;
@@ -249,7 +246,6 @@ export function init(config: ConnectionConfig) {
 					provider: eip1193Provider,
 					currentModule: module,
 					error: undefined,
-					warningMessage: undefined,
 				});
 				logger.log(`module setup`);
 			} catch (err) {
@@ -336,7 +332,6 @@ export function init(config: ConnectionConfig) {
 				state: 'Ready',
 				connecting: undefined,
 				error: undefined,
-				warningMessage: undefined,
 			});
 			listenForChanges();
 			logger.log('SETUP_CHAIN from select');
@@ -348,7 +343,6 @@ export function init(config: ConnectionConfig) {
 				state: 'Locked',
 				connecting: undefined,
 				error: undefined,
-				warningMessage: undefined,
 			});
 		}
 	}
@@ -358,7 +352,6 @@ export function init(config: ConnectionConfig) {
 		set({
 			connecting: false,
 			error: undefined,
-			warningMessage: undefined,
 			selected: undefined,
 			state: 'Idle',
 		});
@@ -394,13 +387,15 @@ export function init(config: ConnectionConfig) {
 				switch ($state.walletName) {
 					case 'Metamask':
 						if (
-							errWithCode.code === 32002 &&
+							errWithCode.code === -32002 &&
 							// TODO do not make this dependent on message but need to ensure 32002 will not be triggered there for other cases
 							errWithCode.message.includes('Already processing eth_requestAccounts. Please wait.')
 						) {
 							set({
-								warningMessage:
-									'To unlock Metamask, please click on the plugin icons and unlock from there.',
+								error: {
+									message: `To unlock your wallet, please click on the Metamask add-on's icon and unlock from there.`,
+									code: 10000,
+								},
 							});
 							// we ignore the error
 							return false;
@@ -413,8 +408,10 @@ export function init(config: ConnectionConfig) {
 							errWithCode.message.includes('The user rejected the request.')
 						) {
 							set({
-								warningMessage:
-									'To unlock Brave, please click on the plugin icons and unlock from there.',
+								error: {
+									message: `To unlock your wallet, please click on the Brave wallet's icon and unlock from there.`,
+									code: 1000,
+								},
 							});
 							// we ignore the error
 							return false;
@@ -432,7 +429,6 @@ export function init(config: ConnectionConfig) {
 					state: 'Ready',
 					unlocking: false,
 					error: undefined,
-					warningMessage: undefined,
 				});
 				logger.log('SETUP_CHAIN from unlock');
 				// await setupChain(address, true); // TODO try catch ?
