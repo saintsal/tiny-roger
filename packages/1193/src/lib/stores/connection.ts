@@ -7,6 +7,8 @@ import { logs } from 'named-logs';
 import { wait } from '$lib/utils/time';
 import { browser } from '$app/environment';
 import { formatChainId } from '$lib/utils/ethereum';
+import { wrapProvider } from '$lib/provider';
+
 const logger = logs('1193-connection');
 
 export type ConnectionState = {
@@ -50,6 +52,16 @@ function fetchPreviousSelection() {
 
 export function init(config: ConnectionConfig) {
 	const options = config.options || ['builtin'];
+	try {
+		if (globalThis.window.ethereum) {
+			// try to wrap the ethereum object if possible
+			globalThis.window.ethereum = wrapProvider(globalThis.window.ethereum, {
+				onSignatureRequest: console.log,
+			});
+		}
+	} catch (err) {
+		logger.info(err);
+	}
 	const builtin = createBuiltinStore(globalThis.window);
 
 	const { $state, set, readable } = createStore<ConnectionState>({

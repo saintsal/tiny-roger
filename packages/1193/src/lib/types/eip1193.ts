@@ -1,7 +1,50 @@
-export interface EIP1193RequestArguments {
+export type EIP1193TransactionRequest = {
+	readonly method: 'eth_sendTransaction';
+	params: [EIP1193TransactionData];
+};
+
+export type EIP1193LegacySignRequest = {
+	readonly method: 'eth_sign';
+	params: [string, string]; // from, hex
+};
+export type EIP1193PersonalSignRequest = {
+	readonly method: 'personal_sign';
+	params: [string, string]; // hex, from
+};
+
+export type EIP1193PTypedSignv4Request = {
+	readonly method: 'eth_signTypedData_v4';
+	params: [string, { [field: string]: any }]; // from, json
+};
+
+export type EIP1193PTypedSignRequest = {
+	readonly method: 'eth_signTypedData';
+	params: [string, { [field: string]: any }]; // from, json
+};
+
+export type EIP1193SignTransactionRequest = {
+	readonly method: 'eth_signTransaction';
+	params: [string];
+};
+
+export type EIP1193GenericRequest = {
 	readonly method: string;
 	readonly params?: readonly unknown[] | object;
-}
+};
+
+export type EIP1193ChainIdRequest = { method: 'eth_chainId' };
+export type EIP1193AccountsRequest = { method: 'eth_accounts' };
+export type EIP1193RequestAccountsRequest = { method: 'eth_requestAccounts' };
+
+export type EIP1193Request =
+	| EIP1193TransactionRequest
+	| EIP1193LegacySignRequest
+	| EIP1193PersonalSignRequest
+	| EIP1193PTypedSignv4Request
+	| EIP1193PTypedSignRequest
+	| EIP1193ChainIdRequest
+	| EIP1193AccountsRequest
+	| EIP1193RequestAccountsRequest;
 
 export interface EIP1193ProviderRpcError extends Error {
 	message: string;
@@ -21,6 +64,16 @@ export interface EIP1193EthSubscription extends EIP1193ProviderMessage {
 		readonly result: unknown;
 	};
 }
+
+export type EIP1193TransactionData = {
+	from: string;
+	to?: string;
+	gas?: string;
+	gasPrice?: string;
+	value?: string;
+	data?: string;
+	nonce?: string;
+};
 
 export interface EIP1193ProviderConnectInfo {
 	readonly chainId: string;
@@ -51,10 +104,15 @@ export interface EIP1193Provider {
 			| Listener<string[]>
 			| Listener<EIP1193ProviderMessage | EIP1193EthSubscription | EIP1193ProviderConnectInfo>
 	): EIP1193Provider;
-	request(args: { method: 'eth_chainId' }): Promise<string>;
-	request(args: { method: 'eth_accounts' }): Promise<string[]>;
-	request(args: { method: 'eth_requestAccounts' }): Promise<string[]>;
-	request(args: EIP1193RequestArguments): Promise<unknown>;
+	request(args: EIP1193ChainIdRequest): Promise<string>;
+	request(args: EIP1193AccountsRequest): Promise<string[]>;
+	request(args: EIP1193RequestAccountsRequest): Promise<string[]>;
+	request(args: EIP1193LegacySignRequest): Promise<string[]>;
+	request(args: EIP1193PersonalSignRequest): Promise<string[]>;
+	request(args: EIP1193PTypedSignv4Request): Promise<string[]>;
+	request(args: EIP1193PTypedSignRequest): Promise<string[]>;
+	request(args: EIP1193TransactionRequest): Promise<string>;
+	request(args: EIP1193Request): Promise<unknown>;
 }
 
 export type EIP1193Block = {
