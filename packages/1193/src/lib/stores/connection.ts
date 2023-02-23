@@ -55,9 +55,7 @@ export function init(config: ConnectionConfig) {
 	try {
 		if (globalThis.window.ethereum) {
 			// try to wrap the ethereum object if possible
-			globalThis.window.ethereum = wrapProvider(globalThis.window.ethereum, {
-				onSignatureRequest: console.log,
-			});
+			globalThis.window.ethereum = wrapProvider(globalThis.window.ethereum, {});
 		}
 	} catch (err) {
 		logger.info(err);
@@ -229,13 +227,24 @@ export function init(config: ConnectionConfig) {
 
 			set({ connecting: true });
 			if (typeOrModule === 'builtin') {
-				const provider = await builtin.probe();
+				const builtinProvider = await builtin.probe();
+				if (!builtinProvider) {
+					const message = `no window.ethereum found!`;
+					set({
+						error: { message, code: 1 }, // TODO code
+						selected: undefined,
+						walletName: undefined,
+						connecting: false,
+					});
+					throw new Error(message);
+				}
+
 				set({
 					requireSelection: false,
 					address: undefined,
 					selected: type,
 					state: 'Idle',
-					provider,
+					provider: wrapProvider(builtinProvider, {}), // TODO observers
 					currentModule: undefined,
 					walletName: walletName(type),
 					error: undefined,
@@ -284,7 +293,7 @@ export function init(config: ConnectionConfig) {
 						selected: type,
 						state: 'Idle',
 						walletName: walletName(type),
-						provider: eip1193Provider,
+						provider: wrapProvider(eip1193Provider, {}), // TODO observers
 						currentModule: module,
 						error: undefined,
 					});
