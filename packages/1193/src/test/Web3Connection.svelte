@@ -19,19 +19,21 @@
 				img: ((v) => {
 					if (v === 'builtin') {
 						if ($builtin.state === 'Ready') {
-							if ($builtin.vendor === 'Metamask') {
-								return 'images/metamask.svg';
+							if ($builtin.vendor === 'Metamdask') {
+								return 'images/wallets/metamask.svg';
 							} else if ($builtin.vendor === 'Opera') {
-								return 'images/opera.svg';
+								return 'images/wallets/opera.svg';
+							} else if ($builtin.vendor === 'Brave') {
+								return 'images/wallets/brave.svg';
 							}
 						}
-						return 'images/web3-default.png';
+						return 'images/wallets/web3-default.png';
 					} else {
 						if (v.startsWith('torus-')) {
 							const verifier = v.slice(6);
-							return `images/torus/${verifier}.svg`;
+							return `images/wallets/torus/${verifier}.svg`;
 						}
-						return `images/${v}.svg`;
+						return `images/wallets/${v}.svg`;
 					}
 				})(v),
 				id: v,

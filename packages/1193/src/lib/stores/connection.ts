@@ -388,7 +388,7 @@ export function init(config: ConnectionConfig) {
 		}
 	}
 	function connect(): Promise<void> {
-		return new Promise<void>((resolve, reject) => {
+		return new Promise<void>(async (resolve, reject) => {
 			let type: string | undefined;
 			if (!type) {
 				if ($state.options.length === 0) {
@@ -398,7 +398,9 @@ export function init(config: ConnectionConfig) {
 				}
 			}
 			if (!type) {
-				set({ connecting: true, requireSelection: true });
+				set({ connecting: true });
+				await builtin.probe();
+				set({ requireSelection: true });
 				connect_resolve = resolve;
 				connect_reject = reject;
 			} else {
