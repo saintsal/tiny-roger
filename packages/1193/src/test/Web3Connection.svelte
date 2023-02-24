@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { connection as conn } from '../app/web3';
+	import { pendingActions, type connection as conn } from '../app/web3';
 	export let connection: typeof conn;
 	import Alert from './Alert.svelte';
 	import ResponsiveModal from './ResponsiveModal.svelte';
@@ -76,5 +76,11 @@
 				</a>
 			</div>
 		{/if}
+	</ResponsiveModal>
+{/if}
+
+{#if $pendingActions.list.length > 0}
+	<ResponsiveModal>
+		{$pendingActions.list[0].item.metadata}
 	</ResponsiveModal>
 {/if}

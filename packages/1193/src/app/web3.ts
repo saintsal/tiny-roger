@@ -14,4 +14,4 @@ const stores = init({
 	],
 });
 
-export const { connection, network, account } = stores;
+export const { connection, network, account, pendingActions } = stores;

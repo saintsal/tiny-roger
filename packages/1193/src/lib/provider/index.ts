@@ -14,25 +14,15 @@ export type EIP1193TransactionWithMetadata = EIP1193TransactionData & {
 	metadata?: any;
 };
 
-export type EIP1193TransactionSent = EIP1193TransactionWithMetadata & {
-	hash: string;
-};
-
 export type SignatureRequest = { from: string; message: unknown; metadata?: any };
-export type SignatureResponse = {
-	from: string;
-	message: unknown;
-	signature: string;
-	metadata?: any;
-};
 
 export interface EIP1193Observers {
-	onTxRequested?: (txData: EIP1193TransactionWithMetadata) => void;
-	onTxCancelled?: (txData: EIP1193TransactionWithMetadata) => void;
-	onTxSent?: (tx: EIP1193TransactionSent) => void;
-	onSignatureRequest?: (fsignature: SignatureRequest) => void;
-	onSignatureCancelled?: (sigRequest: SignatureRequest) => void;
-	onSignatureResponse?: (sigResponse: SignatureResponse) => void;
+	onTxRequested?: (tx: EIP1193TransactionWithMetadata) => void;
+	onTxCancelled?: (tx: EIP1193TransactionWithMetadata) => void;
+	onTxSent?: (tx: EIP1193TransactionWithMetadata, hash: string) => void;
+	onSignatureRequest?: (request: SignatureRequest) => void;
+	onSignatureCancelled?: (request: SignatureRequest) => void;
+	onSignatureResponse?: (request: SignatureRequest, signature: string) => void;
 }
 
 export function wrapProvider(
@@ -75,7 +65,7 @@ export function wrapProvider(
 			const signature = (await _request(args)) as string;
 
 			if (currentObservers?.onSignatureResponse) {
-				currentObservers?.onSignatureResponse({ ...messageWithMetadata, signature });
+				currentObservers?.onSignatureResponse(messageWithMetadata, signature);
 			}
 
 			return signature;
@@ -204,7 +194,7 @@ export function wrapProvider(
 					const hash = await _request({ method: args.method, params: [tx] });
 
 					if (currentObservers?.onTxSent) {
-						currentObservers?.onTxSent({ ...txWithMetadata, hash: hash as string });
+						currentObservers?.onTxSent(txWithMetadata, hash as string);
 					}
 
 					return hash;

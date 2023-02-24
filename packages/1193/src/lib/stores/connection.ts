@@ -8,6 +8,7 @@ import { wait } from '$lib/utils/time';
 import { browser } from '$app/environment';
 import { formatChainId } from '$lib/utils/ethereum';
 import { wrapProvider } from '$lib/provider';
+import { createPendingActionsStore } from './pending-actions';
 
 const logger = logs('1193-connection');
 
@@ -61,6 +62,9 @@ function fetchPreviousSelection() {
 }
 
 export function init(config: ConnectionConfig) {
+	// ----------------------------------------------------------------------------------------------
+	// Arguments Consumption
+	// ----------------------------------------------------------------------------------------------
 	const options =
 		!config.options || config.options.length === 0 ? ['builtin'] : [...config.options];
 	const optionsAsStringArray = options.map((m) => {
@@ -72,18 +76,18 @@ export function init(config: ConnectionConfig) {
 		}
 		return m;
 	});
+	// ----------------------------------------------------------------------------------------------
 
+	// ----------------------------------------------------------------------------------------------
+	// private state
+	// ----------------------------------------------------------------------------------------------
 	let listening: boolean = false;
 	let currentModule: Web3WModule | undefined;
+	// ----------------------------------------------------------------------------------------------
 
-	try {
-		if (globalThis.window.ethereum) {
-			// try to wrap the ethereum object if possible
-			globalThis.window.ethereum = wrapProvider(globalThis.window.ethereum, {});
-		}
-	} catch (err) {
-		logger.info(err);
-	}
+	// ----------------------------------------------------------------------------------------------
+	// STORES
+	// ----------------------------------------------------------------------------------------------
 	const builtin = createBuiltinStore(globalThis.window);
 
 	const { $state, set, readable } = createStore<ConnectionState>({
@@ -119,6 +123,30 @@ export function init(config: ConnectionConfig) {
 		set: setAccount,
 		readable: readableAccount,
 	} = createStore<AccountState>({});
+
+	const { observers, pendingActions } = createPendingActionsStore();
+	// ----------------------------------------------------------------------------------------------
+
+	// ----------------------------------------------------------------------------------------------
+	// function to create the provider
+	// ----------------------------------------------------------------------------------------------
+	function createProvider(ethereum: EIP1193Provider): EIP1193Provider {
+		return wrapProvider(ethereum, observers);
+	}
+	// ----------------------------------------------------------------------------------------------
+
+	// ----------------------------------------------------------------------------------------------
+	// attempt to wrap window.ethereum so all request are captured, no matter how you want to handle it
+	// ----------------------------------------------------------------------------------------------
+	try {
+		if (globalThis.window.ethereum) {
+			// try to wrap the ethereum object if possible
+			globalThis.window.ethereum = createProvider(globalThis.window.ethereum);
+		}
+	} catch (err) {
+		logger.info(err);
+	}
+	// ----------------------------------------------------------------------------------------------
 
 	function hasChainChanged(chainId: string): boolean {
 		return chainId !== $network.chainId;
@@ -270,7 +298,7 @@ export function init(config: ConnectionConfig) {
 					requireSelection: false,
 					connectedWallet: { type, name: walletName(type) },
 					state: 'Idle',
-					provider: wrapProvider(builtinProvider, {}), // TODO observers
+					provider: createProvider(builtinProvider),
 					error: undefined,
 				});
 				currentModule = undefined;
@@ -320,10 +348,9 @@ export function init(config: ConnectionConfig) {
 						state: 'Idle', // TOCHECK needed ?
 						connectedWallet: { type, name: walletName(type) },
 
-						provider: wrapProvider(
-							(moduleSetup as any).eip1193Provider || (moduleSetup as any).web3Provider,
-							{}
-						), // TODO observers
+						provider: createProvider(
+							(moduleSetup as any).eip1193Provider || (moduleSetup as any).web3Provider
+						),
 						error: undefined,
 					});
 					logger.log(`module setup`);
@@ -619,5 +646,6 @@ export function init(config: ConnectionConfig) {
 		account: {
 			...readableAccount,
 		},
+		pendingActions,
 	};
 }
