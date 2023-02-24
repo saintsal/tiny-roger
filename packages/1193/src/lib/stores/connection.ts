@@ -4,7 +4,7 @@ import { MODULE_ERROR } from '$lib/utils/errors';
 import { createStore } from '$lib/utils/stores';
 import { createBuiltinStore } from './builtin';
 import { logs } from 'named-logs';
-import { wait } from '$lib/utils/time';
+import { wait, waitReadyState } from '$lib/utils/time';
 import { browser } from '$app/environment';
 import { formatChainId } from '$lib/utils/ethereum';
 import { wrapProvider } from '$lib/provider';
@@ -251,9 +251,11 @@ export function init(config: ConnectionConfig) {
 	}
 
 	async function select(type: string, moduleConfig?: any) {
+		logger.log(`select...`);
 		try {
 			if ($state.connectedWallet && ($state.state === 'Connected' || $state.state === 'Locked')) {
 				// disconnect first
+				logger.log(`disconnecting for select...`);
 				await disconnect();
 			}
 
@@ -282,7 +284,9 @@ export function init(config: ConnectionConfig) {
 
 			set({ connecting: true });
 			if (typeOrModule === 'builtin') {
+				logger.log(`probing window.ethereum...`);
 				const builtinProvider = await builtin.probe();
+				logger.log(builtinProvider);
 				if (!builtinProvider) {
 					const message = `no window.ethereum found!`;
 					set({
@@ -406,8 +410,15 @@ export function init(config: ConnectionConfig) {
 				// 	}); // TODO timeout checks (Metamask, Portis)
 				// } else {
 				// TODO timeout warning
-				logger.log(`fetching accounts...`);
+
 				try {
+					// even with that issue 7221 remains
+					// accounts =
+					// 	(await waitReadyState().then(() => {
+					// 		logger.log(`fetching accounts...`);
+					// 		return $state.provider?.request({ method: 'eth_accounts' });
+					// 	})) || [];
+					logger.log(`fetching accounts...`);
 					accounts = await $state.provider.request({ method: 'eth_accounts' });
 				} catch (err) {
 					const errWithCode = err as { code: number; message: string };
@@ -461,6 +472,7 @@ export function init(config: ConnectionConfig) {
 				});
 			}
 		} catch (err) {
+			logger.log(`select error`, err);
 			set({ connecting: false, error: (err as any).message || err });
 			throw err;
 		}
