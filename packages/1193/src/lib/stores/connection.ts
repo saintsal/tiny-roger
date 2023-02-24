@@ -14,30 +14,30 @@ const logger = logs('1193-connection');
 export type ConnectionState = {
 	state: 'Idle' | 'Locked' | 'Ready'; // should remains the same once connected
 
-	options: string[]; // should remains the same once initialised // does it need to be exposed this way ? we can use .options from the store object ?
-
-	initialised: boolean; // should remains the same once initialised // used to avoid flash by not displaying connect button until this is executed
+	initialised: boolean; // true once the store is ready in-browser (used to avoid flash by not displaying connect button until this is executed)
 
 	connecting: boolean; // transient
 	requireSelection: boolean; // transiant
-	loadingModule?: boolean; // transient
+	loadingModule: boolean; // transient
 	unlocking: boolean; // transient
 
 	error?: { title?: string; message: string; code: number }; // transient
 
-	selected?: string; // should remains the same once connected // TODO rename to walletTypeSelected ?, do we need walletName ?
-	walletName?: string; // should remains the same once connected // TODO rename to walletNameSelected ?, is it needed of can we have it as part of "selected" call walletSelected ? ?
-	currentModule?: Web3WModule; // should remains the same once connected (does not need to be exposed)
-	listenning: boolean; // should remains the same once connected (does not need to be exposed)
+	connectedWallet?: { type: string; name?: string };
 
 	provider?: EIP1193Provider; // should remains the same once connected // does it need to be exposed ? // maybe for derived store ? but even they can use after changed from Idle to Locked/Ready
 	// regarding Locked, we can make it a variable ? and let be only 2 state : `Disconnected` | `Connected`
 	// this would require a complex use of variable though on the UI as you would have `unlocking` + `locked`
 
-	chainId?: string; // extract it out as we expect this to change /////////////////
-	address?: string; // extract it out as we expect this to change /////////////////
-
 	toJSON(): Partial<ConnectionState>;
+};
+
+export type NetworkState = {
+	chainId?: string;
+};
+
+export type AccountState = {
+	address?: string; // `0x${string}`;
 };
 
 export type ConnectionConfig = {
@@ -61,7 +61,21 @@ function fetchPreviousSelection() {
 }
 
 export function init(config: ConnectionConfig) {
-	const options = config.options || ['builtin'];
+	const options =
+		!config.options || config.options.length === 0 ? ['builtin'] : [...config.options];
+	const optionsAsStringArray = options.map((m) => {
+		if (typeof m === 'object') {
+			if (!m.id) {
+				throw new Error('options need to be string or have an id');
+			}
+			return m.id;
+		}
+		return m;
+	});
+
+	let listening: boolean = false;
+	let currentModule: Web3WModule | undefined;
+
 	try {
 		if (globalThis.window.ethereum) {
 			// try to wrap the ethereum object if possible
@@ -74,20 +88,12 @@ export function init(config: ConnectionConfig) {
 
 	const { $state, set, readable } = createStore<ConnectionState>({
 		state: 'Idle',
-		options: options.map((m) => {
-			if (typeof m === 'object') {
-				if (!m.id) {
-					throw new Error('options need to be string or have an id');
-				}
-				return m.id;
-			}
-			return m;
-		}),
+
 		connecting: false,
-		listenning: false,
 		requireSelection: false,
 		unlocking: false,
 		initialised: false,
+		loadingModule: false,
 
 		toJSON(): Partial<ConnectionState> {
 			return {
@@ -95,21 +101,27 @@ export function init(config: ConnectionConfig) {
 				connecting: $state.connecting,
 				unlocking: $state.unlocking,
 				loadingModule: $state.loadingModule,
-				chainId: $state.chainId,
-				address: $state.address,
-				options: $state.options,
-				selected: $state.selected,
+				connectedWallet: $state.connectedWallet,
 				error: $state.error,
-				listenning: $state.listenning,
-				walletName: $state.walletName,
 				requireSelection: $state.requireSelection,
 				initialised: $state.initialised,
 			};
 		},
 	});
 
+	const {
+		$state: $network,
+		set: setNetwork,
+		readable: readableNetwork,
+	} = createStore<NetworkState>({});
+	const {
+		$state: $account,
+		set: setAccount,
+		readable: readableAccount,
+	} = createStore<AccountState>({});
+
 	function hasChainChanged(chainId: string): boolean {
-		return chainId !== $state.chainId;
+		return chainId !== $network.chainId;
 	}
 
 	async function onChainChanged(chainId: string) {
@@ -123,14 +135,14 @@ export function init(config: ConnectionConfig) {
 		const chainIdAsDecimal = formatChainId(chainId);
 		if (hasChainChanged(chainIdAsDecimal)) {
 			logger.debug('onChainChanged', { chainId, chainIdAsDecimal });
-			set({ chainId: chainIdAsDecimal });
+			setNetwork({ chainId: chainIdAsDecimal });
 		}
 	}
 
 	async function pollAccountsChanged(callback: (accounts: string[]) => void) {
 		while ($state.provider) {
 			await wait(3000); // TODO config
-			if (!$state.listenning) {
+			if (!listening) {
 				break;
 			}
 
@@ -154,7 +166,7 @@ export function init(config: ConnectionConfig) {
 	}
 
 	function hasAccountsChanged(accounts: string[]): boolean {
-		return accounts[0] !== $state.address;
+		return accounts[0] !== $account.address;
 		// TODO multi account support ?
 	}
 
@@ -166,20 +178,22 @@ export function init(config: ConnectionConfig) {
 		logger.debug('onAccountsChanged', { accounts }); // TODO
 		const address = accounts[0];
 		if (address) {
-			set({ address, state: 'Ready', error: undefined });
+			set({ state: 'Ready', error: undefined });
+			setAccount({ address });
 		} else {
-			set({ address: undefined, state: 'Locked', error: undefined });
+			set({ state: 'Locked', error: undefined });
+			setAccount({ address }); // not needed ?
 		}
 		// TODO balance ?
 	}
 
 	function listenForChanges() {
-		if ($state.provider && !$state.listenning) {
+		if ($state.provider && !listening) {
 			logger.log('LISTENNING');
 			$state.provider.on('chainChanged', onChainChanged);
 			$state.provider.on('accountsChanged', onAccountsChanged);
 
-			set({ listenning: true });
+			listening = true;
 
 			// still poll has accountsChanged does not seem to be triggered all the time
 			// this issue was tested in Metamask back in web3w, // TOCHECK
@@ -189,11 +203,11 @@ export function init(config: ConnectionConfig) {
 	}
 
 	function stopListeningForChanges() {
-		if ($state.provider && $state.listenning) {
+		if ($state.provider && listening) {
 			logger.log('STOP LISTENNING');
 			$state.provider.removeListener('chainChanged', onChainChanged);
 			$state.provider.removeListener('accountsChanged', onAccountsChanged);
-			set({ listenning: false });
+			listening = false;
 		}
 	}
 
@@ -202,14 +216,14 @@ export function init(config: ConnectionConfig) {
 			const chainId = await $state.provider?.request({ method: 'eth_chainId' });
 			if (chainId) {
 				const chainIdAsDecimal = formatChainId(chainId);
-				set({ chainId: chainIdAsDecimal });
+				setNetwork({ chainId: chainIdAsDecimal });
 			}
 		} catch (e) {}
 	}
 
 	async function select(type: string, moduleConfig?: any) {
 		try {
-			if ($state.selected && ($state.state === 'Ready' || $state.state === 'Locked')) {
+			if ($state.connectedWallet && ($state.state === 'Ready' || $state.state === 'Locked')) {
 				// disconnect first
 				await disconnect();
 			}
@@ -222,7 +236,7 @@ export function init(config: ConnectionConfig) {
 				} else if (options.length === 1) {
 					typeOrModule = options[0];
 				} else {
-					const message = `No Wallet Type Specified, choose from ${$state.options}`;
+					const message = `No Wallet Type Specified, choose from ${optionsAsStringArray}`;
 					// set(walletStore, {error: {message, code: 1}}); // TODO code
 					throw new Error(message);
 				}
@@ -244,23 +258,22 @@ export function init(config: ConnectionConfig) {
 					const message = `no window.ethereum found!`;
 					set({
 						error: { message, code: 1 }, // TODO code
-						selected: undefined,
-						walletName: undefined,
+						connectedWallet: undefined,
 						connecting: false,
 					});
 					throw new Error(message);
 				}
 
+				// TOCHECK needed ?
+				// setAccount({ address: undefined });
 				set({
 					requireSelection: false,
-					address: undefined,
-					selected: type,
+					connectedWallet: { type, name: walletName(type) },
 					state: 'Idle',
 					provider: wrapProvider(builtinProvider, {}), // TODO observers
-					currentModule: undefined,
-					walletName: walletName(type),
 					error: undefined,
 				});
+				currentModule = undefined;
 			} else {
 				let module: Web3WModule | Web3WModuleLoader | undefined;
 				if (typeof typeOrModule === 'string') {
@@ -281,8 +294,7 @@ export function init(config: ConnectionConfig) {
 					set({
 						requireSelection: false,
 						error: { message, code: 1 },
-						selected: undefined,
-						walletName: undefined,
+						connectedWallet: undefined,
 						connecting: false,
 					}); // TODO code
 					throw new Error(message);
@@ -300,25 +312,26 @@ export function init(config: ConnectionConfig) {
 					}
 					logger.log(`setting up module`);
 					const moduleSetup = await module.setup(moduleConfig); // TODO pass config in select to choose network
+					// TOCHECK needed ?
+					// setAccount({address: undefined})
+					currentModule = module;
+					setNetwork({ chainId: moduleSetup.chainId });
 					set({
-						address: undefined,
-						selected: type,
-						state: 'Idle',
-						walletName: walletName(type),
-						chainId: moduleSetup.chainId,
+						state: 'Idle', // TOCHECK needed ?
+						connectedWallet: { type, name: walletName(type) },
+
 						provider: wrapProvider(
 							(moduleSetup as any).eip1193Provider || (moduleSetup as any).web3Provider,
 							{}
 						), // TODO observers
-						currentModule: module,
 						error: undefined,
 					});
 					logger.log(`module setup`);
 				} catch (err) {
+					currentModule = undefined;
 					set({
 						connecting: false,
-						selected: undefined,
-						walletName: undefined,
+						connectedWallet: undefined,
 						loadingModule: false,
 					});
 					return;
@@ -347,8 +360,7 @@ export function init(config: ConnectionConfig) {
 				const message = `no provider found for wallet type ${type}`;
 				set({
 					error: { message, code: 1 }, // TODO code
-					selected: undefined,
-					walletName: undefined,
+					connectedWallet: undefined,
 					connecting: false,
 				});
 				throw new Error(message);
@@ -394,7 +406,7 @@ export function init(config: ConnectionConfig) {
 				// }
 			} catch (err) {
 				const errWithCode = err as { code: number; message: string };
-				set({ error: errWithCode, selected: undefined, walletName: undefined, connecting: false });
+				set({ error: errWithCode, connectedWallet: undefined, connecting: false });
 				throw err;
 			}
 			logger.debug({ accounts });
@@ -403,18 +415,18 @@ export function init(config: ConnectionConfig) {
 			const address = accounts && accounts[0];
 			if (address) {
 				set({
-					address,
 					state: 'Ready',
 					connecting: false,
 					error: undefined,
 				});
+				setAccount({ address });
 				listenForChanges();
 				logger.log('SETUP_CHAIN from select');
 				// await setupChain(address, false);
 			} else {
 				listenForChanges();
+				setAccount({ address: undefined });
 				set({
-					address: undefined,
 					state: 'Locked',
 					connecting: false,
 					error: undefined,
@@ -428,21 +440,20 @@ export function init(config: ConnectionConfig) {
 
 	async function disconnect(): Promise<void> {
 		stopListeningForChanges();
-		const currentModule = $state.currentModule;
+		setAccount({ address: undefined });
+		setNetwork({ chainId: undefined });
+		const moduleToDisconnect = currentModule;
+		currentModule = undefined;
 		set({
 			connecting: false,
 			error: undefined,
-			selected: undefined,
-			chainId: undefined,
-			address: undefined,
+			connectedWallet: undefined,
 			provider: undefined,
-			currentModule: undefined,
-			walletName: undefined,
 			state: 'Idle',
 		});
 		recordSelection('');
-		if (currentModule) {
-			await currentModule.disconnect();
+		if (moduleToDisconnect) {
+			await moduleToDisconnect.disconnect();
 		}
 	}
 
@@ -468,10 +479,10 @@ export function init(config: ConnectionConfig) {
 		return new Promise<void>(async (resolve, reject) => {
 			let type: string | undefined;
 			if (!type) {
-				if ($state.options.length === 0) {
+				if (optionsAsStringArray.length === 0) {
 					type = 'builtin';
-				} else if ($state.options.length === 1) {
-					type = $state.options[0];
+				} else if (optionsAsStringArray.length === 1) {
+					type = optionsAsStringArray[0];
 				}
 			}
 			if (!type) {
@@ -515,7 +526,7 @@ export function init(config: ConnectionConfig) {
 				accounts = accounts || [];
 			} catch (err) {
 				const errWithCode = err as EIP1193ProviderRpcError;
-				switch ($state.walletName) {
+				switch ($state.connectedWallet?.name) {
 					case 'Metamask':
 						if (
 							errWithCode.code === -32002 &&
@@ -555,8 +566,8 @@ export function init(config: ConnectionConfig) {
 			}
 			if (accounts.length > 0) {
 				const address = accounts[0];
+				setAccount({ address });
 				set({
-					address,
 					state: 'Ready',
 					unlocking: false,
 					error: undefined,
@@ -589,15 +600,24 @@ export function init(config: ConnectionConfig) {
 	}
 
 	return {
-		...readable,
-		acknowledgeError() {
-			set({ error: undefined, unlocking: false });
+		connection: {
+			...readable,
+			acknowledgeError() {
+				set({ error: undefined, unlocking: false });
+			},
+			builtin,
+			connect,
+			select,
+			cancel,
+			disconnect,
+			unlock,
+			options: optionsAsStringArray,
 		},
-		builtin,
-		connect,
-		select,
-		cancel,
-		disconnect,
-		unlock,
+		network: {
+			...readableNetwork,
+		},
+		account: {
+			...readableAccount,
+		},
 	};
 }

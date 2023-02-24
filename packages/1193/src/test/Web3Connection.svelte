@@ -8,11 +8,11 @@
 	const builtin = connection.builtin;
 
 	$: builtinNeedInstalation =
-		($connection.options.filter((v) => v === 'builtin').length > 0 ||
-			$connection.options.length === 0) &&
+		(connection.options.filter((v) => v === 'builtin').length > 0 ||
+			connection.options.length === 0) &&
 		!$builtin.available;
 
-	$: options = $connection.options
+	$: options = connection.options
 		.filter((v) => v !== 'builtin' || $builtin.available)
 		.map((v) => {
 			return {

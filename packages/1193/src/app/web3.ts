@@ -4,7 +4,7 @@ import { WalletConnectModuleLoader } from 'web3w-walletconnect-loader';
 // TODO get chainIds from contracts data
 const chainIds = ['5'];
 
-export const connection = init({
+const stores = init({
 	options: [
 		'builtin',
 		new WalletConnectModuleLoader({
@@ -13,3 +13,5 @@ export const connection = init({
 		}),
 	],
 });
+
+export const { connection, network, account } = stores;

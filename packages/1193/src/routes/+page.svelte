@@ -1,6 +1,6 @@
 <script lang="ts">
 	import JsonAsTable from '$test/JSONAsTable.svelte';
-	import { connection } from '../app/web3';
+	import { account, connection } from '../app/web3';
 </script>
 
 <p>
@@ -8,7 +8,7 @@
 		on:click={() =>
 			$connection.provider?.request({
 				method: 'personal_sign',
-				params: ['0xdeadbeef', $connection.address || ''],
+				params: ['0xdeadbeef', $account.address || ''],
 			})}
 		class="m-1 btn btn-primary btn-sm rounded-box">sign</button
 	>
@@ -17,7 +17,7 @@
 		on:click={() =>
 			$connection.provider?.request({
 				method: 'eth_sendTransaction',
-				params: [{ from: $connection.address || '', to: $connection.address || '', value: '0x01' }],
+				params: [{ from: $account.address || '', to: $account.address || '', value: '0x01' }],
 			})}
 		class="m-1 btn btn-primary btn-sm rounded-box">tx</button
 	>
