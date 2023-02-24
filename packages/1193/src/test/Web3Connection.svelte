@@ -2,6 +2,7 @@
 	import { pendingActions, type connection as conn } from '../app/web3';
 	export let connection: typeof conn;
 	import Alert from './Alert.svelte';
+	import AlertWithSlot from './AlertWithSlot.svelte';
 	import ResponsiveModal from './ResponsiveModal.svelte';
 	import { url } from './utils/url';
 
@@ -43,7 +44,30 @@
 </script>
 
 {#if $connection.error}
-	<Alert data={$connection.error} onClose={connection.acknowledgeError} />
+	{#if $connection.error?.code == 7221}
+		<AlertWithSlot onClose={connection.acknowledgeError}>
+			{#if $builtin.vendor === 'Metamask'}
+				<p>
+					Metamask is not responding. See <a
+						class="link"
+						href="https://github.com/MetaMask/metamask-extension/issues/7221"
+						target="_blank"
+						rel="noreferrer">github issue</a
+					>. Please <a class="link" on:click={() => location.reload()} href=".">reload</a>
+				</p>
+			{:else}
+				<p>
+					Your Wallet is not responding. Please <a
+						class="link"
+						on:click={() => location.reload()}
+						href=".">reload.</a
+					>
+				</p>
+			{/if}
+		</AlertWithSlot>
+	{:else}
+		<Alert data={$connection.error} onClose={connection.acknowledgeError} />
+	{/if}
 {/if}
 
 {#if $connection.requireSelection}

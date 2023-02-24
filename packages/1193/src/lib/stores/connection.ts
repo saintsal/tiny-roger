@@ -13,7 +13,7 @@ import { createPendingActionsStore } from './pending-actions';
 const logger = logs('1193-connection');
 
 export type ConnectionState = {
-	state: 'Idle' | 'Locked' | 'Ready'; // should remains the same once connected
+	state: 'Disconnected' | 'Locked' | 'Connected'; // should remains the same once connected
 
 	initialised: boolean; // true once the store is ready in-browser (used to avoid flash by not displaying connect button until this is executed)
 
@@ -26,7 +26,7 @@ export type ConnectionState = {
 
 	connectedWallet?: { type: string; name?: string };
 
-	provider?: EIP1193Provider; // should remains the same once connected // does it need to be exposed ? // maybe for derived store ? but even they can use after changed from Idle to Locked/Ready
+	provider?: EIP1193Provider; // should remains the same once connected // does it need to be exposed ? // maybe for derived store ? but even they can use after changed from Disconnected to Locked/Connected
 	// regarding Locked, we can make it a variable ? and let be only 2 state : `Disconnected` | `Connected`
 	// this would require a complex use of variable though on the UI as you would have `unlocking` + `locked`
 
@@ -92,7 +92,7 @@ export function init(config: ConnectionConfig) {
 	const builtin = createBuiltinStore(globalThis.window);
 
 	const { $state, set, readable } = createStore<ConnectionState>({
-		state: 'Idle',
+		state: 'Disconnected',
 
 		connecting: false,
 		requireSelection: false,
@@ -207,7 +207,7 @@ export function init(config: ConnectionConfig) {
 		logger.debug('onAccountsChanged', { accounts }); // TODO
 		const address = accounts[0];
 		if (address) {
-			set({ state: 'Ready', error: undefined });
+			set({ state: 'Connected', error: undefined });
 			setAccount({ address });
 		} else {
 			set({ state: 'Locked', error: undefined });
@@ -252,7 +252,7 @@ export function init(config: ConnectionConfig) {
 
 	async function select(type: string, moduleConfig?: any) {
 		try {
-			if ($state.connectedWallet && ($state.state === 'Ready' || $state.state === 'Locked')) {
+			if ($state.connectedWallet && ($state.state === 'Connected' || $state.state === 'Locked')) {
 				// disconnect first
 				await disconnect();
 			}
@@ -298,7 +298,7 @@ export function init(config: ConnectionConfig) {
 				set({
 					requireSelection: false,
 					connectedWallet: { type, name: walletName(type) },
-					state: 'Idle',
+					state: 'Disconnected',
 					provider: createProvider(builtinProvider),
 					error: undefined,
 				});
@@ -346,7 +346,7 @@ export function init(config: ConnectionConfig) {
 					currentModule = module;
 					setNetwork({ chainId: moduleSetup.chainId });
 					set({
-						state: 'Idle', // TOCHECK needed ?
+						state: 'Disconnected', // TOCHECK needed ?
 						connectedWallet: { type, name: walletName(type) },
 
 						provider: createProvider(
@@ -443,7 +443,7 @@ export function init(config: ConnectionConfig) {
 			const address = accounts && accounts[0];
 			if (address) {
 				set({
-					state: 'Ready',
+					state: 'Connected',
 					connecting: false,
 					error: undefined,
 				});
@@ -477,7 +477,7 @@ export function init(config: ConnectionConfig) {
 			error: undefined,
 			connectedWallet: undefined,
 			provider: undefined,
-			state: 'Idle',
+			state: 'Disconnected',
 		});
 		recordSelection('');
 		if (moduleToDisconnect) {
@@ -504,6 +504,10 @@ export function init(config: ConnectionConfig) {
 		}
 	}
 	function connect(): Promise<void> {
+		// TODO? or should connect always start by reasking which wallet?
+		// if ($state.state === 'Locked') {
+		// 	return unlock();
+		// }
 		return new Promise<void>(async (resolve, reject) => {
 			let type: string | undefined;
 			if (!type) {
@@ -596,7 +600,7 @@ export function init(config: ConnectionConfig) {
 				const address = accounts[0];
 				setAccount({ address });
 				set({
-					state: 'Ready',
+					state: 'Connected',
 					unlocking: false,
 					error: undefined,
 				});
@@ -614,12 +618,23 @@ export function init(config: ConnectionConfig) {
 	}
 
 	async function autoStart() {
+		let timeout: NodeJS.Timeout | undefined;
 		try {
+			timeout = setTimeout(() => {
+				set({
+					initialised: true,
+					error: {
+						code: 7221,
+						message: 'Your wallet seems to not respond, please reload.',
+					},
+				});
+			}, 2000);
 			const type = fetchPreviousSelection();
 			if (type && type !== '') {
 				await select(type);
 			}
 		} finally {
+			clearTimeout(timeout);
 			set({ initialised: true });
 		}
 	}
