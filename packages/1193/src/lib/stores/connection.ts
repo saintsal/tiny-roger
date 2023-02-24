@@ -293,7 +293,7 @@ export function init(config: ConnectionConfig) {
 						// if (module.loaded) {
 						//   module = module.loaded;
 						// } else {
-						set({ loadingModule: true });
+						set({ loadingModule: true, requireSelection: false });
 						module = await module.load();
 						set({ loadingModule: false });
 						// }
@@ -315,23 +315,31 @@ export function init(config: ConnectionConfig) {
 					});
 					logger.log(`module setup`);
 				} catch (err) {
-					if ((err as any).message === 'USER_CANCELED') {
-						set({
-							connecting: false,
-							selected: undefined,
-							walletName: undefined,
-							loadingModule: false,
-						});
-					} else {
-						set({
-							error: { code: MODULE_ERROR, message: (err as any).message },
-							selected: undefined,
-							walletName: undefined,
-							connecting: false,
-							loadingModule: false,
-						});
-					}
-					throw err;
+					set({
+						connecting: false,
+						selected: undefined,
+						walletName: undefined,
+						loadingModule: false,
+					});
+					return;
+					// TODO detect real errors vs cancellation
+					// if ((err as any).message === 'USER_CANCELED') {
+					// 	set({
+					// 		connecting: false,
+					// 		selected: undefined,
+					// 		walletName: undefined,
+					// 		loadingModule: false,
+					// 	});
+					// } else {
+					// 	set({
+					// 		error: { code: MODULE_ERROR, message: (err as any).message },
+					// 		selected: undefined,
+					// 		walletName: undefined,
+					// 		connecting: false,
+					// 		loadingModule: false,
+					// 	});
+					// }
+					// throw err;
 				}
 			}
 
@@ -420,6 +428,7 @@ export function init(config: ConnectionConfig) {
 
 	async function disconnect(): Promise<void> {
 		stopListeningForChanges();
+		const currentModule = $state.currentModule;
 		set({
 			connecting: false,
 			error: undefined,
@@ -432,6 +441,9 @@ export function init(config: ConnectionConfig) {
 			state: 'Idle',
 		});
 		recordSelection('');
+		if (currentModule) {
+			await currentModule.disconnect();
+		}
 	}
 
 	let connect_resolve: (() => void) | undefined;

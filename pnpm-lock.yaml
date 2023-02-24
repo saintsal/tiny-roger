@@ -116,7 +116,7 @@ importers:
       tslib: ^2.4.1
       typescript: ^4.9.3
       vite: ^4.0.0
-      web3w-portis-loader: ^0.3.3
+      web3w-walletconnect-loader: ^0.4.3
     dependencies:
       named-logs: 0.2.1
     devDependencies:
@@ -139,7 +139,7 @@ importers:
       tslib: 2.5.0
       typescript: 4.9.5
       vite: 4.1.1
-      web3w-portis-loader: 0.3.3
+      web3w-walletconnect-loader: 0.4.3
 
   web:
     specifiers:
@@ -8699,8 +8699,8 @@ packages:
       utf8: 3.0.0
     dev: true
 
-  /web3w-portis-loader/0.3.3:
-    resolution: {integrity: sha512-k0Pg9B0rTKkuS9qF91VGGklId8wmleLYXIu80FhrtdxxoipRU8YSgGquxj52uCEw6PYBxM2HUwcRPqlwRnvAcA==}
+  /web3w-walletconnect-loader/0.4.3:
+    resolution: {integrity: sha512-34vN/BMQn63S4b5RSsYWQLrvlJ7lpQvnPivyKcjmgawR1J7ug6acsYa3Il+8FzMLKUnrhSPd+l4WpbJvBmVtZQ==}
     dependencies:
       named-logs: 0.1.0
     dev: true
