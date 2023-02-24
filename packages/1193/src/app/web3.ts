@@ -5,6 +5,7 @@ import { WalletConnectModuleLoader } from 'web3w-walletconnect-loader';
 const chainIds = ['5'];
 
 const stores = init({
+	autoConnectUsingPrevious: true,
 	options: [
 		'builtin',
 		new WalletConnectModuleLoader({

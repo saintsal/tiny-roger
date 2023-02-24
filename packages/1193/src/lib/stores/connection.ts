@@ -43,6 +43,7 @@ export type AccountState = {
 
 export type ConnectionConfig = {
 	options?: (string | Web3WModule | Web3WModuleLoader)[];
+	autoConnectUsingPrevious?: boolean;
 };
 
 // let LOCAL_STORAGE_TRANSACTIONS_SLOT = '_web3w_transactions';
@@ -613,17 +614,22 @@ export function init(config: ConnectionConfig) {
 	}
 
 	async function autoStart() {
-		const type = fetchPreviousSelection();
-		if (type && type !== '') {
-			await select(type);
+		try {
+			const type = fetchPreviousSelection();
+			if (type && type !== '') {
+				await select(type);
+			}
+		} finally {
+			set({ initialised: true });
 		}
 	}
 
 	if (browser) {
-		// if (config.autoSelectPrevious) {
-		autoStart();
-		// }
-		set({ initialised: true });
+		if (config.autoConnectUsingPrevious) {
+			autoStart();
+		} else {
+			set({ initialised: true });
+		}
 	}
 
 	return {

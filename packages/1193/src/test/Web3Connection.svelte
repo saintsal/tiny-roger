@@ -19,7 +19,7 @@
 				img: ((v) => {
 					if (v === 'builtin') {
 						if ($builtin.state === 'Ready') {
-							if ($builtin.vendor === 'Metamdask') {
+							if ($builtin.vendor === 'Metamask') {
 								return 'images/wallets/metamask.svg';
 							} else if ($builtin.vendor === 'Opera') {
 								return 'images/wallets/opera.svg';
@@ -80,7 +80,29 @@
 {/if}
 
 {#if $pendingActions.list.length > 0}
-	<ResponsiveModal>
-		{$pendingActions.list[0].item.metadata}
+	<!-- <ResponsiveModal onClose={() => (confirmModalExit = () => pendingActions.skip())}> -->
+	<ResponsiveModal onClose={() => pendingActions.skip()}>
+		<!-- TODO confirm -->
+		{$pendingActions.list[0].item.metadata && $pendingActions.list[0].item.metadata.title
+			? $pendingActions.list[0].item.metadata.title
+			: 'Please confirm or reject the request on your wallet.'}
 	</ResponsiveModal>
 {/if}
+
+<!-- {#if confirmModalExit}
+	<ResponsiveModal id="AreYouSure" onClose={() => (confirmModalExit = undefined)}>
+		<div class="text-center">
+			{confirmModalExit}
+			<p>Are you sure ?</p>
+		</div>
+		<div class="text-center">OR</div>
+		<div class="flex justify-center">
+			<button
+				on:click={() => confirmModalExit && confirmModalExit()}
+				class="m-4 w-max-content btn btn-primary"
+			>
+				yes
+			</button>
+		</div>
+	</ResponsiveModal>
+{/if} -->

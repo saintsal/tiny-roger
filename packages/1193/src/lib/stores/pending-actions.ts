@@ -51,8 +51,14 @@ export function createPendingActionsStore() {
 		},
 	};
 
+	function skip() {
+		$state.list.shift();
+		set({ list: $state.list });
+	}
+
 	const store = {
 		...readable,
+		skip,
 	};
 	return { pendingActions: store, observers };
 }
