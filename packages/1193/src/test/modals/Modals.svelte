@@ -2,11 +2,19 @@
 	import { createEventDispatcher } from 'svelte';
 	import { fade, fly } from 'svelte/transition';
 	import ModalContent from './ModalContent.svelte';
-
-	const dispatch = createEventDispatcher();
-
 	import { modalStore } from './stores';
 	import type { ModalCancelationMode, ModalContentSettings } from './types';
+
+	// ----------------------------------------------------------------------------------------------
+	// EXPORTS
+	// ----------------------------------------------------------------------------------------------
+	export let duration = 150;
+	export let flyOpacity = 0;
+	export let flyX = 0;
+	export let flyY = 100;
+	// ----------------------------------------------------------------------------------------------
+
+	const dispatch = createEventDispatcher();
 
 	let content: HTMLDivElement;
 	let settings: ModalContentSettings | undefined = undefined;
@@ -19,11 +27,6 @@
 			settings = modal.content;
 		}
 	}
-
-	export let duration = 150;
-	export let flyOpacity = 0;
-	export let flyX = 0;
-	export let flyY = 100;
 
 	// ----------------------------------------------------------------------------------------------
 	// Event Handlers

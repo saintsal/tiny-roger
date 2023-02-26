@@ -1,14 +1,25 @@
 <script lang="ts">
 	import { modalStore } from './stores';
-	import type { ModalContentSettings } from './types';
+	import type {
+		ModalCancellationOptions,
+		ModalContentSettings,
+		ModalResponseCallback,
+	} from './types';
 	import { focusTrap } from '../skeleton/actions/FocusTrap/focusTrap';
 
+	// ----------------------------------------------------------------------------------------------
+	// EXPORTS
+	// ----------------------------------------------------------------------------------------------
 	export let element: HTMLElement | undefined = undefined;
-	export let onResponse: ((response: boolean) => boolean | undefined | void) | undefined;
-	export let settings: ModalContentSettings | undefined = undefined;
-	export let cancelation:
-		| ({ button: boolean; clickOutside?: boolean } | { cancelable: false })
+	export let onResponse: ModalResponseCallback | undefined;
+	export let settings:
+		| ModalContentSettings
+		| {
+				type: 'custom';
+		  }
 		| undefined = undefined;
+	export let cancelation: ModalCancellationOptions | undefined = undefined;
+	// ----------------------------------------------------------------------------------------------
 </script>
 
 <div bind:this={element} use:focusTrap={true}>

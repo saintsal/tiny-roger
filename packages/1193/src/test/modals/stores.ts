@@ -27,7 +27,3 @@ function modalService() {
 }
 
 export const modalStore = modalService();
-
-if (typeof window !== 'undefined' && window) {
-	(window as any).modalStore = modalStore;
-}

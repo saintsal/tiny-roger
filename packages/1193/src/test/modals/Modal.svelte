@@ -2,14 +2,21 @@
 	import { onMount } from 'svelte';
 	import { onDestroy } from 'svelte/internal';
 	import { modalStore } from './stores';
-	import type { ModalCancelationMode, ModalContentSettings } from './types';
+	import type {
+		ModalCancelationMode,
+		ModalContentSettings,
+		ModalCancellationOptions,
+		ModalResponseCallback,
+	} from './types';
 	import ModalContent from './ModalContent.svelte';
 
-	export let onResponse: ((response: boolean) => boolean | undefined | void) | undefined;
+	// ----------------------------------------------------------------------------------------------
+	// EXPORTS
+	// ----------------------------------------------------------------------------------------------
+	export let onResponse: ModalResponseCallback | undefined;
 	export let settings: ModalContentSettings | undefined = undefined;
-	export let cancelation:
-		| ({ button: boolean; clickOutside?: boolean } | { cancelable: false })
-		| undefined = undefined;
+	export let cancelation: ModalCancellationOptions | undefined = undefined;
+	// ----------------------------------------------------------------------------------------------
 
 	let element: HTMLElement;
 	onMount(() => {

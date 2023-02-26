@@ -19,7 +19,10 @@ export type ModalContentSettings =
 			type: 'confirm';
 			title?: string;
 			message: string;
-	  }
-	| {
-			type: 'custom';
 	  };
+
+export type ModalCancellationOptions =
+	| { button: boolean; clickOutside?: boolean }
+	| { cancelable: false };
+
+export type ModalResponseCallback = (response: boolean) => boolean | undefined | void;
