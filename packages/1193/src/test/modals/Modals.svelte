@@ -84,6 +84,7 @@
 		>
 			<div
 				class="modal-box relative"
+				style="--tw-translate-y:0;"
 				transition:fly={{ duration, opacity: flyOpacity, x: flyX, y: flyY }}
 				bind:this={content}
 			>

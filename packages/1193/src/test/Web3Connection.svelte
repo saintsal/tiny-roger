@@ -74,7 +74,7 @@
 {#if $connection.requireSelection}
 	<Modal onResponse={() => connection.cancel()}>
 		<div class="text-center">
-			<p>You need to connect your wallet.</p>
+			<p>How do you want to connect ?</p>
 		</div>
 		<div class="flex flex-wrap justify-center pb-3">
 			{#each options as option}
@@ -107,11 +107,20 @@
 {#if $pendingActions.list.length > 0}
 	<Modal
 		onResponse={() => {
+			// in case the tx is rejected while showing that confirmation modal
+			// we need to close it
+			// TODO have modal id to ensure we close the right one
+			const unsubscribe = pendingActions.subscribe((p) => {
+				if (p.list.length === 0) {
+					modalStore.close();
+				}
+			});
 			modalStore.trigger({
 				response: (yes) => {
 					if (yes) {
 						pendingActions.skip();
 					}
+					unsubscribe();
 					return true;
 				},
 				content: {
