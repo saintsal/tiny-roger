@@ -1,11 +1,9 @@
 import type { EIP1193Provider, EIP1193ProviderRpcError } from '$lib/types/eip1193';
 import type { Web3WModule, Web3WModuleLoader } from '$lib/types/modules';
-import { MODULE_ERROR } from '$lib/utils/errors';
 import { createStore } from '$lib/utils/stores';
 import { createBuiltinStore } from './builtin';
 import { logs } from 'named-logs';
-import { wait, waitReadyState } from '$lib/utils/time';
-import { browser } from '$app/environment';
+import { wait } from '$lib/utils/time';
 import { formatChainId } from '$lib/utils/ethereum';
 import { wrapProvider } from '$lib/provider';
 import { createPendingActionsStore } from './pending-actions';
@@ -651,7 +649,7 @@ export function init(config: ConnectionConfig) {
 		}
 	}
 
-	if (browser) {
+	if (typeof window !== undefined) {
 		if (config.autoConnectUsingPrevious) {
 			autoStart();
 		} else {
