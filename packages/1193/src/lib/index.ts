@@ -1,3 +1,1 @@
-export function init(window: Window) {
-	console.log(window.ethereum);
-}
+export * from './stores/connection';
