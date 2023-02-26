@@ -1,7 +1,8 @@
 // Action: Focus Trap
 
 export function focusTrap(node: HTMLElement, enabled: boolean) {
-	const elemWhitelist = 'a[href], button, input, textarea, select, details, [tabindex]:not([tabindex="-1"])';
+	const elemWhitelist =
+		'a[href], button, input, textarea, select, details, [tabindex]:not([tabindex="-1"])';
 	let elemFirst: HTMLElement;
 	let elemLast: HTMLElement;
 
@@ -51,6 +52,6 @@ export function focusTrap(node: HTMLElement, enabled: boolean) {
 		},
 		destroy() {
 			onDestory();
-		}
+		},
 	};
 }
