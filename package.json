@@ -9,7 +9,8 @@
   },
   "scripts": {
     "test": "dotenv-extended env",
-    "dev": "dotenv-extended pnpm --parallel dev",
+    "contracts+indexer": "dotenv-extended pnpm run --filter ./contracts --filter ./indexer --parallel dev",
+    "web:dev": "dotenv-extended pnpm run ---filter ./web dev",
     "sync-deps": "syncpack fix-mismatches && pnpm -r format:fix"
   },
   "pnpm": {
