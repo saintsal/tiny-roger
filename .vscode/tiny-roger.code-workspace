@@ -11,6 +11,10 @@
 		{
 			"name": "web",
 			"path": "../web"
+		},
+		{
+			"name": "web3-connection",
+			"path": "../packages/web3-connection"
 		}
 		// {
 		// 	"name": "ROOT",

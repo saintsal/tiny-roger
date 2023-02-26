@@ -1,5 +1,20 @@
-<section class="py-2 px-4 text-center">
-	<div class="max-w-auto md:max-w-lg mx-auto">
-		<p class="!text-2xl flex justify-center space-x-2 font-black my-8">TODO</p>
+<script>
+	import ConnectButton from '$lib/web3/ConnectButton.svelte';
+	import Web3Connection from '$lib/web3/Web3Connection.svelte';
+	import Modals from '$lib/components/modals/Modals.svelte';
+	import { connection } from '$lib/web3';
+</script>
+
+<div class="navbar bg-base-100">
+	<div class="navbar-start">
+		<span class="normal-case text-xl">Testing</span>
 	</div>
-</section>
+	<div class="navbar-center hidden lg:flex" />
+	<div class="navbar-end">
+		<ConnectButton />
+	</div>
+</div>
+
+<Web3Connection {connection} />
+
+<Modals />
