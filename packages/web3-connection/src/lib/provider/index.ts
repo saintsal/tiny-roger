@@ -30,7 +30,7 @@ export function wrapProvider(
 	observers: EIP1193Observers
 ): EIP1193Provider {
 	let currentObservers = observers;
-	if ((ethereum as any).__1193__) {
+	if ((ethereum as any).__web3_connection__) {
 		// do not rewrap if already an 1193 Proxy, but set the new observers
 		(ethereum as any).setObservers(observers);
 		return ethereum;
@@ -255,7 +255,7 @@ export function wrapProvider(
 					return request;
 				case 'setNextMetadata':
 					return setNextMetadata;
-				case '__1193__':
+				case '__web3_connection__':
 					return true;
 				case 'setObservers':
 					return setObservers;
