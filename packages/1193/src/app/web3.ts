@@ -16,3 +16,20 @@ const stores = init({
 });
 
 export const { connection, network, account, pendingActions } = stores;
+
+// connection.subscribe((v) => {
+// 	if (v.requireSelection) {
+// 		console.log('TRIGGER');
+// 		modalStore.trigger({
+// 			type: 'alert',
+// 			title: 'Example Alert',
+// 			body: 'This is an example modal.',
+// 			image: 'https://i.imgur.com/WOgTG96.gif',
+// 			// Optionally override buttont text
+// 			buttonTextCancel: 'Cancel',
+// 		});
+// 	} else {
+// 		console.log('CLOSE');
+// 		modalStore.close();
+// 	}
+// });

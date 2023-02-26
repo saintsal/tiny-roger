@@ -3,7 +3,7 @@
 	export let connection: typeof conn;
 	import Alert from './Alert.svelte';
 	import AlertWithSlot from './AlertWithSlot.svelte';
-	import ResponsiveModal from './ResponsiveModal.svelte';
+	import Modal from './modals/Modal.svelte';
 	import { url } from './utils/url';
 
 	const builtin = connection.builtin;
@@ -41,6 +41,8 @@
 				name: v,
 			};
 		});
+
+	let requireConfirmation: (() => void) | undefined;
 </script>
 
 {#if $connection.error}
@@ -71,7 +73,7 @@
 {/if}
 
 {#if $connection.requireSelection}
-	<ResponsiveModal onClose={() => connection.cancel()}>
+	<Modal id="selection" onCancelRequest={() => connection.cancel()}>
 		<div class="text-center">
 			<p>You need to connect your wallet.</p>
 		</div>
@@ -100,33 +102,24 @@
 				</a>
 			</div>
 		{/if}
-	</ResponsiveModal>
+	</Modal>
+{/if}
+
+{#if requireConfirmation}
+	<Modal id="confirmation" onCancelRequest={() => (requireConfirmation = undefined)}
+		><p>Are you sure ?</p></Modal
+	>
 {/if}
 
 {#if $pendingActions.list.length > 0}
-	<!-- <ResponsiveModal onClose={() => (confirmModalExit = () => pendingActions.skip())}> -->
-	<ResponsiveModal onClose={() => pendingActions.skip()}>
-		<!-- TODO confirm -->
+	<Modal
+		id="pendingAction"
+		onCancelRequest={() => {
+			requireConfirmation = () => pendingActions.skip();
+		}}
+	>
 		{$pendingActions.list[0].item.metadata && $pendingActions.list[0].item.metadata.title
 			? $pendingActions.list[0].item.metadata.title
 			: 'Please confirm or reject the request on your wallet.'}
-	</ResponsiveModal>
+	</Modal>
 {/if}
-
-<!-- {#if confirmModalExit}
-	<ResponsiveModal id="AreYouSure" onClose={() => (confirmModalExit = undefined)}>
-		<div class="text-center">
-			{confirmModalExit}
-			<p>Are you sure ?</p>
-		</div>
-		<div class="text-center">OR</div>
-		<div class="flex justify-center">
-			<button
-				on:click={() => confirmModalExit && confirmModalExit()}
-				class="m-4 w-max-content btn btn-primary"
-			>
-				yes
-			</button>
-		</div>
-	</ResponsiveModal>
-{/if} -->

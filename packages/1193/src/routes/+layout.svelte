@@ -5,6 +5,7 @@
 	import { connection, account, pendingActions } from '../app/web3';
 	import InlineInfo from '$test/InlineInfo.svelte';
 	import ImgBlockie from '$test/ethereum/ImgBlockie.svelte';
+	import Modals from '$test/modals/Modals.svelte';
 </script>
 
 <Web3Connection {connection} />
@@ -75,3 +76,5 @@
 </div>
 
 <slot />
+
+<Modals />
