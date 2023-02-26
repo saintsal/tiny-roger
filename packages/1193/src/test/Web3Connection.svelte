@@ -4,6 +4,7 @@
 	import Alert from './Alert.svelte';
 	import AlertWithSlot from './AlertWithSlot.svelte';
 	import Modal from './modals/Modal.svelte';
+	import { modalStore } from './modals/stores';
 	import { url } from './utils/url';
 
 	const builtin = connection.builtin;
@@ -41,8 +42,6 @@
 				name: v,
 			};
 		});
-
-	let requireConfirmation: (() => void) | undefined;
 </script>
 
 {#if $connection.error}
@@ -73,7 +72,7 @@
 {/if}
 
 {#if $connection.requireSelection}
-	<Modal id="selection" onResponse={() => connection.cancel()}>
+	<Modal onResponse={() => connection.cancel()}>
 		<div class="text-center">
 			<p>You need to connect your wallet.</p>
 		</div>
@@ -105,24 +104,21 @@
 	</Modal>
 {/if}
 
-{#if requireConfirmation}
-	<Modal
-		id="confirmation"
-		settings={{ type: 'confirm', message: 'Are you sure?' }}
-		onResponse={(resp) => {
-			if (resp) {
-				requireConfirmation && requireConfirmation();
-			}
-			requireConfirmation = undefined;
-		}}
-	/>
-{/if}
-
 {#if $pendingActions.list.length > 0}
 	<Modal
-		id="pendingAction"
 		onResponse={() => {
-			requireConfirmation = () => pendingActions.skip();
+			modalStore.trigger({
+				response: (yes) => {
+					if (yes) {
+						pendingActions.skip();
+					}
+					return true;
+				},
+				content: {
+					type: 'confirm',
+					message: 'Are you sure?',
+				},
+			});
 		}}
 		cancelation={{ button: true, clickOutside: false }}
 	>

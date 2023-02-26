@@ -1,15 +1,23 @@
 <script lang="ts">
 	import { createEventDispatcher } from 'svelte';
 	import { fade, fly } from 'svelte/transition';
+	import ModalContent from './ModalContent.svelte';
 
 	const dispatch = createEventDispatcher();
 
 	import { modalStore } from './stores';
-	import type { ModalCancelationMode } from './types';
+	import type { ModalCancelationMode, ModalContentSettings } from './types';
 
 	let content: HTMLDivElement;
+	let settings: ModalContentSettings | undefined = undefined;
 	$: if (content && $modalStore[0]) {
-		content.appendChild($modalStore[0].element);
+		const modal = $modalStore[0];
+		if ('element' in modal) {
+			content.appendChild(modal.element);
+			settings = undefined;
+		} else {
+			settings = modal.content;
+		}
 	}
 
 	export let duration = 150;
@@ -41,6 +49,16 @@
 		}
 	}
 
+	function confirmAndClose(yes: boolean) {
+		if ($modalStore[0].response) {
+			if ($modalStore[0].response(yes)) {
+				modalStore.close();
+			}
+		} else {
+			modalStore.close();
+		}
+	}
+
 	function onKeyDown(event: KeyboardEvent): void {
 		if (!$modalStore.length) return;
 		if (event.code === 'Escape') {
@@ -65,7 +83,11 @@
 				class="modal-box relative"
 				transition:fly={{ duration, opacity: flyOpacity, x: flyX, y: flyY }}
 				bind:this={content}
-			/>
+			>
+				{#if settings}
+					<ModalContent {settings} onResponse={confirmAndClose} />
+				{/if}
+			</div>
 		</div>
 	{/key}
 {/if}
