@@ -73,7 +73,7 @@
 {/if}
 
 {#if $connection.requireSelection}
-	<Modal id="selection" onCancelRequest={() => connection.cancel()}>
+	<Modal id="selection" onResponse={() => connection.cancel()}>
 		<div class="text-center">
 			<p>You need to connect your wallet.</p>
 		</div>
@@ -106,20 +106,35 @@
 {/if}
 
 {#if requireConfirmation}
-	<Modal id="confirmation" onCancelRequest={() => (requireConfirmation = undefined)}
-		><p>Are you sure ?</p></Modal
-	>
+	<Modal
+		id="confirmation"
+		settings={{ type: 'confirm', message: 'Are you sure?' }}
+		onResponse={(resp) => {
+			if (resp) {
+				requireConfirmation && requireConfirmation();
+			}
+			requireConfirmation = undefined;
+		}}
+	/>
 {/if}
 
 {#if $pendingActions.list.length > 0}
 	<Modal
 		id="pendingAction"
-		onCancelRequest={() => {
+		onResponse={() => {
 			requireConfirmation = () => pendingActions.skip();
 		}}
+		cancelation={{ button: true, clickOutside: false }}
 	>
-		{$pendingActions.list[0].item.metadata && $pendingActions.list[0].item.metadata.title
-			? $pendingActions.list[0].item.metadata.title
-			: 'Please confirm or reject the request on your wallet.'}
+		{#if $pendingActions.list[0].item.metadata && $pendingActions.list[0].item.metadata.title}
+			<h3 class="text-lg font-bold">{$pendingActions.list[0].item.metadata.title}</h3>
+		{/if}
+		<p class="py-4">
+			{#if $pendingActions.list[0].item.metadata && $pendingActions.list[0].item.metadata.description}
+				{$pendingActions.list[0].item.metadata.description}
+			{:else}
+				'Please confirm or reject the request on your wallet.'
+			{/if}
+		</p>
 	</Modal>
 {/if}

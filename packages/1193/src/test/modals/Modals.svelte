@@ -5,6 +5,7 @@
 	const dispatch = createEventDispatcher();
 
 	import { modalStore } from './stores';
+	import type { ModalCancelationMode } from './types';
 
 	let content: HTMLDivElement;
 	$: if (content && $modalStore[0]) {
@@ -24,15 +25,15 @@
 			return;
 		}
 		if (event.target.classList.contains('modal')) {
-			cancel();
+			cancel('clickOutside');
 		}
 		/** @event {{ event }} backdrop - Fires on backdrop interaction.  */
 		dispatch('backdrop', event);
 	}
 
-	function cancel(): void {
+	function cancel(mode: ModalCancelationMode): void {
 		if ($modalStore[0].response) {
-			if ($modalStore[0].response(false)) {
+			if ($modalStore[0].response(false, mode)) {
 				// modalStore.close();
 			}
 		} else {
@@ -43,7 +44,7 @@
 	function onKeyDown(event: KeyboardEvent): void {
 		if (!$modalStore.length) return;
 		if (event.code === 'Escape') {
-			cancel();
+			cancel('esc');
 		}
 	}
 	// ----------------------------------------------------------------------------------------------
