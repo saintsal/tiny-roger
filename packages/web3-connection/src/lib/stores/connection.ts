@@ -649,7 +649,7 @@ export function init(config: ConnectionConfig) {
 		}
 	}
 
-	if (typeof window !== undefined) {
+	if (typeof window !== 'undefined') {
 		if (config.autoConnectUsingPrevious) {
 			autoStart();
 		} else {
