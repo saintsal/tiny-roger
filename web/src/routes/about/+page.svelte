@@ -13,8 +13,8 @@
 			It can be used to quickly get a dev environment for hackathon or quick prototypes.
 		</p>
 		<p class="!text-xl flex justify-center space-x-2 my-8">
-			But it is also a good starting point for long term projects as it contains a preset of best
-			practises for web and ipfs deploymemnt.
+			But it is also a good starting point for long term projects as it contains a set of best
+			practises for web and ipfs deployment.
 		</p>
 		<p class="!text-xl flex justify-center space-x-2 my-8">
 			{name} is also a great set of tool to ensure your application remains fully decentralised.
