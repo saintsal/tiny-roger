@@ -1,10 +1,23 @@
 type ResolveFunction<T> = (value: T) => unknown;
 type RejectFunction = (err: unknown) => void;
 
-export function createManageablePromise<T>() {
+export function createManageablePromise<T>(callbacks?: {
+	onResolve: ResolveFunction<T>;
+	onReject: RejectFunction;
+}) {
 	let _promise: Promise<T> | undefined;
 	let _resolve: ResolveFunction<T> | undefined;
 	let _reject: RejectFunction | undefined;
+	function clear(): { reject: RejectFunction; resolve: ResolveFunction<T> } | undefined {
+		if (_promise) {
+			const past = { reject: _reject as RejectFunction, resolve: _resolve as ResolveFunction<T> };
+			_promise = undefined;
+			_resolve = undefined;
+			_reject = undefined;
+			return past;
+		}
+		return undefined;
+	}
 	return {
 		promise(execute?: (resolve: ResolveFunction<T>, reject: RejectFunction) => void) {
 			if (_promise) {
@@ -21,15 +34,19 @@ export function createManageablePromise<T>() {
 		},
 		reject(err: unknown) {
 			if (_reject) {
-				_reject(err);
+				clear()?.reject(err);
+				callbacks?.onReject(err);
 			}
-			throw new Error(`no pending promise, cannot reject`);
+			// TODO remove, not really errors
+			// console.error(`no pending promise, cannot reject`);
 		},
 		resolve(value: T) {
 			if (_resolve) {
-				_resolve(value);
+				clear()?.resolve(value);
+				callbacks?.onResolve(value);
 			}
-			throw new Error(`no pending promise, cannot resolve`);
+			// TODO remove, not really errors
+			// console.error(`no pending promise, cannot resolve`);
 		},
 	};
 }

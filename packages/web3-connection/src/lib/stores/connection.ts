@@ -7,6 +7,7 @@ import { wait } from '$lib/utils/time';
 import { formatChainId } from '$lib/utils/ethereum';
 import { wrapProvider } from '$lib/provider';
 import { createPendingActionsStore } from './pending-actions';
+import { createManageablePromise } from '$lib/utils/promises';
 
 const logger = logs('1193-connection');
 
@@ -62,11 +63,13 @@ export type ConnectedAccountState = AccountState & {
 	address: string; // `0x${string}`;
 };
 
-export type ExecuteCallback<T> = (state: {
+export type OnExecuteState = {
 	connection: ConnectedState;
 	account: ConnectedAccountState;
 	network: ConnectedNetworkState;
-}) => Promise<T>;
+};
+
+export type ExecuteCallback<T> = (state: OnExecuteState) => Promise<T>;
 
 export type ConnectionConfig = {
 	options?: (string | Web3WModule | Web3WModuleLoader)[];
@@ -495,7 +498,7 @@ export function init(config: ConnectionConfig) {
 				logger.log('SETUP_CHAIN from select');
 				// await setupChain(address, false);
 
-				resolve_connect();
+				_connect.resolve(true);
 			} else {
 				listenForChanges();
 				setAccount({ address: undefined });
@@ -534,44 +537,10 @@ export function init(config: ConnectionConfig) {
 		}
 	}
 
-	let connect_resolve: (() => void) | undefined;
-	let connect_reject: ((err: unknown) => void) | undefined;
-	function resolve_connect() {
-		const resolve = connect_resolve;
-		connect_resolve = undefined;
-		connect_reject = undefined;
-		if (resolve) {
-			resolve();
-		}
-		if (resolve_execute) {
-			resolve_execute();
-		}
-	}
-	function reject_connect(err: unknown) {
-		const reject = connect_reject;
-		connect_resolve = undefined;
-		connect_reject = undefined;
-		if (reject) {
-			reject(err);
-		}
-		if (reject_execute) {
-			reject_execute(err);
-		}
-	}
-	function connect(options: { reconnect: boolean } = { reconnect: true }): Promise<void> {
-		// TODO? or should connect always start by reasking which wallet?
-		// if ($state.state === 'Locked') {
-		// 	return unlock();
-		// }
-		return new Promise<void>(async (resolve, reject) => {
-			if (options && !options.reconnect) {
-				if ($state.state === 'Connected') {
-					return resolve();
-				} else if ($state.state === 'Locked') {
-					return unlock();
-				}
-			}
+	const _connect = createManageablePromise<boolean>();
 
+	function connect(): Promise<boolean> {
+		return _connect.promise(async (resolve, reject) => {
 			let type: string | undefined;
 			if (!type) {
 				if (optionsAsStringArray.length === 0) {
@@ -584,12 +553,9 @@ export function init(config: ConnectionConfig) {
 				set({ connecting: true });
 				await builtin.probe();
 				set({ requireSelection: true });
-				connect_resolve = resolve;
-				connect_reject = reject;
 			} else {
 				set({ connecting: true });
 				select(type).catch((err) => {
-					reject_connect(err);
 					throw err;
 				});
 			}
@@ -598,7 +564,7 @@ export function init(config: ConnectionConfig) {
 
 	function cancel() {
 		set({ requireSelection: false, connecting: false });
-		resolve_connect(); // TODO failure mode so execute is not executed and throw, we not want connect to fails though => benefit of Promise<boolean>
+		_connect.resolve(false);
 	}
 
 	function walletName(type: string): string | undefined {
@@ -661,7 +627,7 @@ export function init(config: ConnectionConfig) {
 					error: undefined,
 				});
 				logger.log('SETUP_CHAIN from unlock');
-				resolve_connect();
+				_connect.resolve(true);
 				// await setupChain(address, true); // TODO try catch ?
 			} else {
 				set({ unlocking: false });
@@ -674,30 +640,7 @@ export function init(config: ConnectionConfig) {
 		}
 	}
 
-	let executeCallback: ExecuteCallback<unknown> | undefined;
-	let execute_resolve: ((result: unknown) => void) | undefined;
-	let execute_reject: ((err: unknown) => void) | undefined;
-	async function resolve_execute() {
-		const resolve = execute_resolve;
-		execute_resolve = undefined;
-		execute_reject = undefined;
-		if (resolve && executeCallback) {
-			executeCallback({
-				connection: $state as ConnectedState,
-				account: $account as ConnectedAccountState,
-				network: $network as ConnectedNetworkState,
-			}).then(resolve);
-		}
-	}
-	function reject_execute(err: unknown) {
-		const reject = execute_reject;
-		execute_resolve = undefined;
-		execute_reject = undefined;
-		if (reject) {
-			reject(err);
-		}
-	}
-	async function execute<T>(callback: ExecuteCallback<T>) {
+	async function execute<T>(callback: ExecuteCallback<T>): Promise<T> {
 		if ($state.state === 'Connected') {
 			return callback({
 				connection: $state as ConnectedState,
@@ -705,24 +648,23 @@ export function init(config: ConnectionConfig) {
 				network: $network as ConnectedNetworkState,
 			});
 		}
-		return new Promise<T>(async (resolve, reject) => {
-			executeCallback = callback;
-			execute_resolve = resolve as (result: unknown) => void;
-			execute_reject = reject;
-			connect({ reconnect: false });
+		return new Promise((resolve, reject) => {
+			connect()
+				.then((connected) => {
+					if (connected) {
+						callback({
+							connection: $state as ConnectedState,
+							account: $account as ConnectedAccountState,
+							network: $network as ConnectedNetworkState,
+						}).then(resolve);
+					} else {
+						reject(new Error(`not connected`));
+					}
+				})
+				.catch((err) => {
+					reject(err);
+				});
 		});
-		// return connect({ reconnect: false }).then(async () => {
-		// 	set({ executing: true });
-		// 	try {
-		// 		return await callback({
-		// 			connection: $state as ConnectedState,
-		// 			account: $account as ConnectedAccountState,
-		// 			network: $network as ConnectedNetworkState,
-		// 		});
-		// 	} finally {
-		// 		set({ executing: false });
-		// 	}
-		// });
 	}
 
 	async function autoStart() {

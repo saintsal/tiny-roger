@@ -11,7 +11,6 @@ function modalService() {
 		update,
 		/** Append to end of queue. */
 		trigger: (modal: ModalSettings) => {
-			console.log(`trigger modal`);
 			update((mStore) => {
 				mStore.unshift(modal);
 				return mStore;
@@ -20,7 +19,6 @@ function modalService() {
 
 		/**  Remove first item in queue. */
 		close: () => {
-			console.log(`close modal`);
 			update((mStore) => {
 				if (mStore.length > 0) mStore.shift();
 				return mStore;
@@ -33,6 +31,7 @@ function modalService() {
 
 export const modalStore = modalService();
 
+// TODO remove, or better add option to auto inject stores
 if (typeof window !== 'undefined') {
 	(window as any).modalStore = modalStore;
 }
