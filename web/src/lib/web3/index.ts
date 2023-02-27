@@ -16,3 +16,10 @@ const stores = init({
 });
 
 export const { connection, network, account, pendingActions } = stores;
+
+if (typeof window !== 'undefined') {
+	(window as any).connection = connection;
+	(window as any).network = network;
+	(window as any).account = account;
+	(window as any).pendingActions = pendingActions;
+}

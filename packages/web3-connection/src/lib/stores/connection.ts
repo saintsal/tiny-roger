@@ -10,6 +10,8 @@ import { createPendingActionsStore } from './pending-actions';
 
 const logger = logs('1193-connection');
 
+export type ConnectionError = { title?: string; message: string; code: number };
+
 export type ConnectionState = {
 	state: 'Disconnected' | 'Locked' | 'Connected'; // should remains the same once connected
 
@@ -19,8 +21,9 @@ export type ConnectionState = {
 	requireSelection: boolean; // transiant
 	loadingModule: boolean; // transient
 	unlocking: boolean; // transient
+	executing: boolean;
 
-	error?: { title?: string; message: string; code: number }; // transient
+	error?: ConnectionError; // transient
 
 	connectedWallet?: { type: string; name?: string };
 
@@ -31,13 +34,39 @@ export type ConnectionState = {
 	toJSON(): Partial<ConnectionState>;
 };
 
+export type ConnectedState = ConnectionState & {
+	state: 'Connected';
+	initialised: true;
+	connecting: false;
+	requireSelection: false;
+	loadingModule: false;
+	unlocking: false;
+	executing: boolean;
+	connectedWalet: { type: string; name?: string };
+	provider: EIP1193Provider;
+};
+
 export type NetworkState = {
 	chainId?: string;
+};
+
+export type ConnectedNetworkState = NetworkState & {
+	chainId: string;
 };
 
 export type AccountState = {
 	address?: string; // `0x${string}`;
 };
+
+export type ConnectedAccountState = AccountState & {
+	address: string; // `0x${string}`;
+};
+
+export type ExecuteCallback<T> = (state: {
+	connection: ConnectedState;
+	account: ConnectedAccountState;
+	network: ConnectedNetworkState;
+}) => Promise<T>;
 
 export type ConnectionConfig = {
 	options?: (string | Web3WModule | Web3WModuleLoader)[];
@@ -97,6 +126,7 @@ export function init(config: ConnectionConfig) {
 		unlocking: false,
 		initialised: false,
 		loadingModule: false,
+		executing: false,
 
 		toJSON(): Partial<ConnectionState> {
 			return {
@@ -108,6 +138,7 @@ export function init(config: ConnectionConfig) {
 				error: $state.error,
 				requireSelection: $state.requireSelection,
 				initialised: $state.initialised,
+				executing: $state.executing,
 			};
 		},
 	});
@@ -248,7 +279,10 @@ export function init(config: ConnectionConfig) {
 		} catch (e) {}
 	}
 
-	async function select(type: string, moduleConfig?: any) {
+	async function select(type: string, config?: { moduleConfig?: any; autoUnlock: boolean }) {
+		const { moduleConfig, autoUnlock: autoUnlockFromConfig } = config || { autoUnlock: true };
+		const autoUnlock = autoUnlockFromConfig === undefined ? true : autoUnlockFromConfig;
+
 		logger.log(`select...`);
 		try {
 			if ($state.connectedWallet && ($state.state === 'Connected' || $state.state === 'Locked')) {
@@ -460,6 +494,8 @@ export function init(config: ConnectionConfig) {
 				listenForChanges();
 				logger.log('SETUP_CHAIN from select');
 				// await setupChain(address, false);
+
+				resolve_connect();
 			} else {
 				listenForChanges();
 				setAccount({ address: undefined });
@@ -468,6 +504,9 @@ export function init(config: ConnectionConfig) {
 					connecting: false,
 					error: undefined,
 				});
+				if (autoUnlock) {
+					return unlock();
+				}
 			}
 		} catch (err) {
 			logger.log(`select error`, err);
@@ -504,6 +543,9 @@ export function init(config: ConnectionConfig) {
 		if (resolve) {
 			resolve();
 		}
+		if (resolve_execute) {
+			resolve_execute();
+		}
 	}
 	function reject_connect(err: unknown) {
 		const reject = connect_reject;
@@ -512,13 +554,24 @@ export function init(config: ConnectionConfig) {
 		if (reject) {
 			reject(err);
 		}
+		if (reject_execute) {
+			reject_execute(err);
+		}
 	}
-	function connect(): Promise<void> {
+	function connect(options: { reconnect: boolean } = { reconnect: true }): Promise<void> {
 		// TODO? or should connect always start by reasking which wallet?
 		// if ($state.state === 'Locked') {
 		// 	return unlock();
 		// }
 		return new Promise<void>(async (resolve, reject) => {
+			if (options && !options.reconnect) {
+				if ($state.state === 'Connected') {
+					return resolve();
+				} else if ($state.state === 'Locked') {
+					return unlock();
+				}
+			}
+
 			let type: string | undefined;
 			if (!type) {
 				if (optionsAsStringArray.length === 0) {
@@ -535,24 +588,17 @@ export function init(config: ConnectionConfig) {
 				connect_reject = reject;
 			} else {
 				set({ connecting: true });
-				select(type)
-					.catch((err) => {
-						reject_connect(err);
-						throw err;
-					})
-					.then(() => {
-						resolve_connect();
-						if ($state.state === 'Locked') {
-							return unlock();
-						}
-					});
+				select(type).catch((err) => {
+					reject_connect(err);
+					throw err;
+				});
 			}
 		});
 	}
 
 	function cancel() {
 		set({ requireSelection: false, connecting: false });
-		resolve_connect();
+		resolve_connect(); // TODO failure mode so execute is not executed and throw, we not want connect to fails though => benefit of Promise<boolean>
 	}
 
 	function walletName(type: string): string | undefined {
@@ -615,6 +661,7 @@ export function init(config: ConnectionConfig) {
 					error: undefined,
 				});
 				logger.log('SETUP_CHAIN from unlock');
+				resolve_connect();
 				// await setupChain(address, true); // TODO try catch ?
 			} else {
 				set({ unlocking: false });
@@ -625,6 +672,57 @@ export function init(config: ConnectionConfig) {
 		} else {
 			throw new Error(`Not Locked`);
 		}
+	}
+
+	let executeCallback: ExecuteCallback<unknown> | undefined;
+	let execute_resolve: ((result: unknown) => void) | undefined;
+	let execute_reject: ((err: unknown) => void) | undefined;
+	async function resolve_execute() {
+		const resolve = execute_resolve;
+		execute_resolve = undefined;
+		execute_reject = undefined;
+		if (resolve && executeCallback) {
+			executeCallback({
+				connection: $state as ConnectedState,
+				account: $account as ConnectedAccountState,
+				network: $network as ConnectedNetworkState,
+			}).then(resolve);
+		}
+	}
+	function reject_execute(err: unknown) {
+		const reject = execute_reject;
+		execute_resolve = undefined;
+		execute_reject = undefined;
+		if (reject) {
+			reject(err);
+		}
+	}
+	async function execute<T>(callback: ExecuteCallback<T>) {
+		if ($state.state === 'Connected') {
+			return callback({
+				connection: $state as ConnectedState,
+				account: $account as ConnectedAccountState,
+				network: $network as ConnectedNetworkState,
+			});
+		}
+		return new Promise<T>(async (resolve, reject) => {
+			executeCallback = callback;
+			execute_resolve = resolve as (result: unknown) => void;
+			execute_reject = reject;
+			connect({ reconnect: false });
+		});
+		// return connect({ reconnect: false }).then(async () => {
+		// 	set({ executing: true });
+		// 	try {
+		// 		return await callback({
+		// 			connection: $state as ConnectedState,
+		// 			account: $account as ConnectedAccountState,
+		// 			network: $network as ConnectedNetworkState,
+		// 		});
+		// 	} finally {
+		// 		set({ executing: false });
+		// 	}
+		// });
 	}
 
 	async function autoStart() {
@@ -641,7 +739,7 @@ export function init(config: ConnectionConfig) {
 			}, 2000);
 			const type = fetchPreviousSelection();
 			if (type && type !== '') {
-				await select(type);
+				await select(type, { autoUnlock: false });
 			}
 		} finally {
 			clearTimeout(timeout);
@@ -669,6 +767,7 @@ export function init(config: ConnectionConfig) {
 			cancel,
 			disconnect,
 			unlock,
+			execute,
 			options: optionsAsStringArray,
 		},
 		network: {

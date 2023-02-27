@@ -21,7 +21,12 @@
 	$: if (content && $modalStore[0]) {
 		const modal = $modalStore[0];
 		if ('element' in modal) {
-			content.appendChild(modal.element);
+			if (modal.element.parentNode !== content) {
+				while (content.firstChild) {
+					content.removeChild(content.firstChild);
+				}
+				content.appendChild(modal.element);
+			}
 			settings = undefined;
 		} else {
 			settings = modal.content;
@@ -74,24 +79,22 @@
 <svelte:window on:keydown={onKeyDown} />
 
 {#if $modalStore.length > 0}
-	{#key $modalStore}
+	<div
+		style="pointer-events: auto; visibility: visible; opacity: 1;"
+		class="modal modal-bottom sm:modal-middle cursor-pointer"
+		on:mousedown={onBackdropInteraction}
+		on:touchstart={onBackdropInteraction}
+		transition:fade={{ duration }}
+	>
 		<div
-			style="pointer-events: auto; visibility: visible; opacity: 1;"
-			class="modal modal-bottom sm:modal-middle cursor-pointer"
-			on:mousedown={onBackdropInteraction}
-			on:touchstart={onBackdropInteraction}
-			transition:fade={{ duration }}
+			class="modal-box relative"
+			style="--tw-translate-y:0;"
+			transition:fly={{ duration, opacity: flyOpacity, x: flyX, y: flyY }}
+			bind:this={content}
 		>
-			<div
-				class="modal-box relative"
-				style="--tw-translate-y:0;"
-				transition:fly={{ duration, opacity: flyOpacity, x: flyX, y: flyY }}
-				bind:this={content}
-			>
-				{#if settings}
-					<ModalContent {settings} onResponse={confirmAndClose} />
-				{/if}
-			</div>
+			{#if settings}
+				<ModalContent {settings} onResponse={confirmAndClose} />
+			{/if}
 		</div>
-	{/key}
+	</div>
 {/if}
