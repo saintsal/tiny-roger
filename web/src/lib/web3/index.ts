@@ -18,7 +18,7 @@ const stores = init({
 	networks: get(contractsInfos),
 });
 
-export const { connection, network, account, pendingActions } = stores;
+export const { connection, network, account, pendingActions, execute } = stores;
 
 if (typeof window !== 'undefined') {
 	(window as any).connection = connection;

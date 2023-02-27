@@ -24,7 +24,6 @@ function handleAutomaticUpdate(registration: ServiceWorkerRegistration) {
 	let lastFocusTime = performance.now();
 	function wakeup() {
 		const timePassed = performance.now();
-		// console.log('wakeup ', lastFocusTime / 60 / 1000, 'vs', timePassed / 60 / 1000);
 		if (timePassed - lastFocusTime > IDLE_DELAY_MS) {
 			registration.update();
 		}
@@ -87,12 +86,10 @@ if (!dev && typeof navigator !== 'undefined' && 'serviceWorker' in navigator) {
 			updateLoggingForWorker(registration.waiting);
 			updateLoggingForWorker(registration.active);
 			listenForWaitingServiceWorker(registration, () => {
-				console.log('[Service Worker] Update found');
 				serviceWorker.set({ registration, updateAvailable: true });
 			});
 		})
 		.catch((e) => {
-			console.log(e);
-			// console.error('Failed to register service worker', e);
+			console.error('Failed to register service worker', e);
 		});
 }

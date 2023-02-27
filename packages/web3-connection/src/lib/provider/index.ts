@@ -235,6 +235,8 @@ export function wrapProvider(
 				);
 		}
 
+		// TODO handle unlocking via 'eth_requestAccounts ?
+
 		return _request(args);
 	}
 

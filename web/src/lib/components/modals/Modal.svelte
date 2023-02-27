@@ -13,7 +13,7 @@
 	// ----------------------------------------------------------------------------------------------
 	// EXPORTS
 	// ----------------------------------------------------------------------------------------------
-	export let onResponse: ModalResponseCallback | undefined;
+	export let onResponse: ModalResponseCallback | undefined = undefined;
 	export let settings: ModalContentSettings | undefined = undefined;
 	export let cancelation: ModalCancellationOptions | undefined = undefined;
 	// ----------------------------------------------------------------------------------------------

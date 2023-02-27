@@ -1,6 +1,8 @@
 import { writable, type Readable } from 'svelte/store';
 
-export function createStore<T>($state: T): {
+export function createStore<T extends { [field: string]: unknown }>(
+	$state: T
+): {
 	set(data: Partial<T>): void;
 	readonly $state: T;
 	readable: Readable<T> & {
@@ -11,7 +13,7 @@ export function createStore<T>($state: T): {
 	const store = writable($state);
 	function set(data: Partial<T>) {
 		for (const field of Object.keys(data)) {
-			($state as any)[field] = (data as any)[field];
+			($state as any)[field] = data[field];
 		}
 		store.set($state);
 	}

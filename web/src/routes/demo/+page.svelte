@@ -2,7 +2,7 @@
 	import ConnectButton from '$lib/web3/ConnectButton.svelte';
 	import Web3Connection from '$lib/web3/Web3Connection.svelte';
 	import Modals from '$lib/components/modals/Modals.svelte';
-	import { connection, pendingActions } from '$lib/web3';
+	import { connection, pendingActions, account, network } from '$lib/web3';
 	import { contracts } from '$lib/web3/ethers';
 
 	let messageToSend: string;
@@ -33,12 +33,11 @@
 <button
 	on:click={() =>
 		contracts.execute(async ({ contracts }) => {
-			console.log({ contracts });
 			contracts.GreetingsRegistry.setMessage(messageToSend);
 		})}
 	class="m-1 btn btn-primary">Say it!</button
 >
 
-<Web3Connection {connection} {pendingActions} />
+<Web3Connection {connection} {pendingActions} {account} />
 
 <Modals />

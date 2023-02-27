@@ -1,6 +1,10 @@
-import { connection } from '.';
+import { execute } from '.';
 import { BrowserProvider, Contract } from 'ethers';
-import type { ConnectedState, ConnectedAccountState, ConnectedNetworkState } from 'web3-connection';
+import type {
+	ConnectedState,
+	ConnectedAccountState,
+	ConnectedAndSupportedNetworkState,
+} from 'web3-connection';
 
 // const contracts: { [name: string]: Contract } = {};
 // export const ethersContracts = derived(
@@ -29,15 +33,14 @@ export const contracts = {
 	execute<T>(
 		callback: (state: {
 			connection: ConnectedState;
-			network: ConnectedNetworkState;
+			network: ConnectedAndSupportedNetworkState;
 			account: ConnectedAccountState;
 			contracts: { [name: string]: Contract };
 		}) => Promise<T>
 	) {
-		return connection.execute(async ({ connection, network, account }) => {
+		return execute(async ({ connection, network, account }) => {
 			const contracts: { [name: string]: Contract } = {};
 			const signer = await new BrowserProvider(connection.provider).getSigner(account.address);
-			console.log(network);
 			if (network.contracts) {
 				for (const name of Object.keys(network.contracts)) {
 					const contract = new Contract(

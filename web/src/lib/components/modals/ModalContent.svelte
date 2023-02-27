@@ -23,7 +23,7 @@
 </script>
 
 <div bind:this={element} use:focusTrap={true}>
-	{#if (cancelation && 'button' in cancelation && cancelation.button) || (settings?.type === 'info' && (!cancelation || !('button' in cancelation)))}
+	{#if (cancelation && 'button' in cancelation && cancelation.button) || (settings?.type !== 'info' && (!cancelation || !('button' in cancelation)))}
 		<button
 			on:click={() => (onResponse ? onResponse(false) : modalStore.close())}
 			class="btn btn-sm btn-circle absolute right-2 top-2">✕</button

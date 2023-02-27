@@ -4,9 +4,9 @@
 	import InlineInfo from '$lib/components/alert/InlineInfo.svelte';
 </script>
 
-{#if $connection.state !== 'Connected'}
-	{#if $connection.state === 'Locked'}
-		{#if $connection.unlocking}
+{#if $connection.state === 'Disconnected' || $account.locked}
+	{#if $account.locked}
+		{#if $account.unlocking}
 			<!-- <Alert
 			data={{ message: 'if the wallet unlock screen did not popup, please refers to its menus.' }}
 			bgBorderText="bg-warning border-warning-content text-warning-content"
@@ -16,8 +16,8 @@
 		{/if}
 		<button
 			class="m-1 btn btn-primary"
-			disabled={$connection.unlocking}
-			on:click={() => connection.unlock()}>unlock</button
+			disabled={$account.unlocking}
+			on:click={() => account.unlock()}>unlock</button
 		>
 	{:else}
 		<button
