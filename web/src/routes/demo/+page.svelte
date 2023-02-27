@@ -3,21 +3,9 @@
 	import Web3Connection from '$lib/web3/Web3Connection.svelte';
 	import Modals from '$lib/components/modals/Modals.svelte';
 	import { connection, pendingActions } from '$lib/web3';
-	import { BrowserProvider, Contract } from 'ethers';
+	import { contracts } from '$lib/web3/ethers';
 
 	let messageToSend: string;
-	function sayHello() {
-		connection.execute(async ({ connection, network, account }) => {
-			const signer = await new BrowserProvider(connection.provider).getSigner(account.address);
-			console.log(`executing...`);
-			const GreetingsRegistry = network.contracts?.GreetingsRegistry;
-
-			if (GreetingsRegistry) {
-				const contract = new Contract(GreetingsRegistry.address, GreetingsRegistry.abi, signer);
-				return contract.setMessage(messageToSend);
-			}
-		});
-	}
 </script>
 
 <div class="navbar bg-base-100">
@@ -42,7 +30,14 @@
 		class="!inline input input-bordered w-full max-w-xs"
 	/>
 </div>
-<button on:click={() => sayHello()} class="m-1 btn btn-primary">Say it!</button>
+<button
+	on:click={() =>
+		contracts.execute(async ({ contracts }) => {
+			console.log({ contracts });
+			contracts.GreetingsRegistry.setMessage(messageToSend);
+		})}
+	class="m-1 btn btn-primary">Say it!</button
+>
 
 <Web3Connection {connection} {pendingActions} />
 

@@ -7,6 +7,7 @@ export function getContractInfos(
 ): ContractsInfos {
 	if (networkConfigs.chainId) {
 		const networkConfig = networkConfigs as NetworkConfig;
+
 		if (chainId === networkConfig.chainId || chainId == formatChainId(networkConfig.chainId)) {
 			return networkConfig.contracts;
 		} else {

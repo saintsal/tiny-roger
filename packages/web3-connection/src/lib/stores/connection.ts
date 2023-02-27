@@ -341,11 +341,11 @@ export function init(config: ConnectionConfig) {
 			if (chainId) {
 				const chainIdAsDecimal = formatChainId(chainId);
 				if ($network.state === 'Disconnected') {
-					setNetwork({ chainId: chainIdAsDecimal, state: 'Connected' });
+					setNetwork({ chainId: chainIdAsDecimal, state: 'Connected', fetchingChainId: false });
 				} else {
 					logger.log(`refetched chainId`);
 					// TODO if chainId changed ?
-					setNetwork({ chainId: chainIdAsDecimal });
+					setNetwork({ chainId: chainIdAsDecimal, fetchingChainId: false });
 				}
 			}
 		} catch (e) {
@@ -556,7 +556,13 @@ export function init(config: ConnectionConfig) {
 			}
 			logger.debug({ accounts });
 			recordSelection(type);
-			fetchChainId();
+			await fetchChainId();
+			if ($network.chainId) {
+				await handleNetwork($network.chainId);
+			} else {
+				// TODO? error
+			}
+
 			const address = accounts && accounts[0];
 			if (address) {
 				set({
