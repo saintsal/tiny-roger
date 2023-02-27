@@ -1,5 +1,7 @@
 import { init } from 'web3-connection';
 import { WalletConnectModuleLoader } from 'web3w-walletconnect-loader';
+import { contractsInfos } from '$lib/blockchain/contracts';
+import { get } from 'svelte/store';
 
 // TODO get chainIds from contracts data
 const chainIds = ['5'];
@@ -13,6 +15,7 @@ const stores = init({
 			chains: chainIds.map((v) => parseInt(v)),
 		}),
 	],
+	networks: get(contractsInfos),
 });
 
 export const { connection, network, account, pendingActions } = stores;

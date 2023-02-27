@@ -27,6 +27,7 @@
 		"vite": "^4.1.4"
 	},
 	"dependencies": {
+		"ethers": "^6.0.8",
 		"named-logs": "^0.2.1",
 		"theme-change": "^2.3.0",
 		"web3-connection": "workspace:*",

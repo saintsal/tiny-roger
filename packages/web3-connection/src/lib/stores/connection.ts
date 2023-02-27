@@ -8,8 +8,29 @@ import { formatChainId } from '$lib/utils/ethereum';
 import { wrapProvider } from '$lib/provider';
 import { createPendingActionsStore } from './pending-actions';
 import { createManageablePromise } from '$lib/utils/promises';
+import { getContractInfos } from '$lib/utils/contracts';
 
 const logger = logs('1193-connection');
+
+// TODO ABI type
+type Abi = any[];
+export type ContractsInfos = { [name: string]: { address: string; abi: Abi } };
+export type NetworkConfig<ContractTypes extends ContractsInfos = ContractsInfos> = {
+	chainId: string;
+	name?: string;
+	contracts: ContractTypes;
+};
+
+export type MultiNetworkConfigs<ContractTypes extends ContractsInfos = ContractsInfos> = {
+	[chainId: string]: NetworkConfig<ContractTypes>;
+};
+
+export type NetworkConfigs<ContractTypes extends ContractsInfos = ContractsInfos> =
+	| MultiNetworkConfigs<ContractTypes>
+	| NetworkConfig<ContractTypes>
+	| ((
+			chainId: string
+	  ) => Promise<NetworkConfig<ContractTypes> | MultiNetworkConfigs<ContractTypes>>);
 
 export type ConnectionError = { title?: string; message: string; code: number };
 
@@ -47,9 +68,26 @@ export type ConnectedState = ConnectionState & {
 	provider: EIP1193Provider;
 };
 
-export type NetworkState = {
-	chainId?: string;
-};
+// TODO types: <ContractTypes extends ContractsInfos = ContractsInfos>
+export type NetworkState =
+	| {
+			state: 'Disconnected';
+			fetchingChainId: boolean;
+			chainId: undefined;
+			contracts: undefined;
+	  }
+	| {
+			state: 'Connected';
+			chainId: string;
+			fetchingChainId: false;
+			contracts: undefined;
+	  }
+	| {
+			state: 'Loaded';
+			chainId: string;
+			notSupported: boolean;
+			contracts?: ContractsInfos;
+	  };
 
 export type ConnectedNetworkState = NetworkState & {
 	chainId: string;
@@ -74,6 +112,7 @@ export type ExecuteCallback<T> = (state: OnExecuteState) => Promise<T>;
 export type ConnectionConfig = {
 	options?: (string | Web3WModule | Web3WModuleLoader)[];
 	autoConnectUsingPrevious?: boolean;
+	networks?: NetworkConfigs;
 };
 
 // let LOCAL_STORAGE_TRANSACTIONS_SLOT = '_web3w_transactions';
@@ -150,7 +189,12 @@ export function init(config: ConnectionConfig) {
 		$state: $network,
 		set: setNetwork,
 		readable: readableNetwork,
-	} = createStore<NetworkState>({});
+	} = createStore<NetworkState>({
+		state: 'Disconnected',
+		fetchingChainId: false,
+		chainId: undefined,
+		contracts: undefined,
+	});
 	const {
 		$state: $account,
 		set: setAccount,
@@ -196,7 +240,25 @@ export function init(config: ConnectionConfig) {
 		const chainIdAsDecimal = formatChainId(chainId);
 		if (hasChainChanged(chainIdAsDecimal)) {
 			logger.debug('onChainChanged', { chainId, chainIdAsDecimal });
-			setNetwork({ chainId: chainIdAsDecimal });
+			handleNetwork(chainIdAsDecimal);
+		}
+	}
+
+	async function handleNetwork(chainId: string) {
+		if (!config.networks) {
+			setNetwork({ chainId, state: 'Loaded', contracts: undefined });
+		} else {
+			let networkConfigs = config.networks;
+			if (typeof networkConfigs === 'function') {
+				setNetwork({ chainId, state: 'Connected', contracts: undefined });
+				networkConfigs = await networkConfigs(chainId);
+				// TODO cache
+				const contractsInfos = getContractInfos(networkConfigs, chainId);
+				setNetwork({ chainId, state: 'Loaded', contracts: contractsInfos });
+			} else {
+				const contractsInfos = getContractInfos(networkConfigs, chainId);
+				setNetwork({ chainId, state: 'Loaded', contracts: contractsInfos });
+			}
 		}
 	}
 
@@ -274,12 +336,21 @@ export function init(config: ConnectionConfig) {
 
 	async function fetchChainId() {
 		try {
+			setNetwork({ fetchingChainId: true });
 			const chainId = await $state.provider?.request({ method: 'eth_chainId' });
 			if (chainId) {
 				const chainIdAsDecimal = formatChainId(chainId);
-				setNetwork({ chainId: chainIdAsDecimal });
+				if ($network.state === 'Disconnected') {
+					setNetwork({ chainId: chainIdAsDecimal, state: 'Connected' });
+				} else {
+					logger.log(`refetched chainId`);
+					// TODO if chainId changed ?
+					setNetwork({ chainId: chainIdAsDecimal });
+				}
 			}
-		} catch (e) {}
+		} catch (e) {
+			setNetwork({ fetchingChainId: false, state: 'Disconnected' });
+		}
 	}
 
 	async function select(type: string, config?: { moduleConfig?: any; autoUnlock: boolean }) {
@@ -383,7 +454,7 @@ export function init(config: ConnectionConfig) {
 					// TOCHECK needed ?
 					// setAccount({address: undefined})
 					currentModule = module;
-					setNetwork({ chainId: moduleSetup.chainId });
+					await handleNetwork(moduleConfig.chainId);
 					set({
 						state: 'Disconnected', // TOCHECK needed ?
 						connectedWallet: { type, name: walletName(type) },
@@ -521,7 +592,7 @@ export function init(config: ConnectionConfig) {
 	async function disconnect(): Promise<void> {
 		stopListeningForChanges();
 		setAccount({ address: undefined });
-		setNetwork({ chainId: undefined });
+		setNetwork({ chainId: undefined, state: 'Disconnected', contracts: undefined });
 		const moduleToDisconnect = currentModule;
 		currentModule = undefined;
 		set({

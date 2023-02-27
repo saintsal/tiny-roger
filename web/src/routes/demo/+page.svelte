@@ -3,15 +3,19 @@
 	import Web3Connection from '$lib/web3/Web3Connection.svelte';
 	import Modals from '$lib/components/modals/Modals.svelte';
 	import { connection, pendingActions } from '$lib/web3';
+	import { BrowserProvider, Contract } from 'ethers';
 
 	let messageToSend: string;
 	function sayHello() {
-		connection.execute(async ({ connection, account }) => {
+		connection.execute(async ({ connection, network, account }) => {
+			const signer = await new BrowserProvider(connection.provider).getSigner(account.address);
 			console.log(`executing...`);
-			return connection.provider.request({
-				method: 'eth_sendTransaction',
-				params: [{ from: account.address, value: '0x02', to: account.address }],
-			});
+			const GreetingsRegistry = network.contracts?.GreetingsRegistry;
+
+			if (GreetingsRegistry) {
+				const contract = new Contract(GreetingsRegistry.address, GreetingsRegistry.abi, signer);
+				return contract.setMessage(messageToSend);
+			}
 		});
 	}
 </script>
