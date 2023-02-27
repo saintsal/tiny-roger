@@ -9,6 +9,7 @@
   },
   "scripts": {
     "test": "dotenv-extended env",
+    "build": "dotenv-extended pnpm run --filter ./contracts export goerli && pnpm run --filter web3-connection build && pnpm run --filter ./indexer build && pnpm run --filter ./web build",
     "contracts+indexer": "dotenv-extended pnpm run --filter ./contracts --filter ./indexer --parallel dev",
     "web:dev": "dotenv-extended pnpm run ---filter ./web dev",
     "sync-deps": "syncpack fix-mismatches && pnpm -r format:fix"

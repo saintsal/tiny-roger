@@ -27,10 +27,8 @@ jobs:
           cache: "pnpm"
       - name: Install dependencies
         run: pnpm install
-      - name: build web3-connection, needed by web
-        run: pnpm run --filter web3-connection build
-      - name: build web
-        run: pnpm run --filter ./web build
+      - name: build
+        run: pnpm build
       # - name: deploy web
       #   id: cid
       #   run: pnpm run --filter ./web deploy >> "$GITHUB_OUTPUT"

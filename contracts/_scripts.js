@@ -88,7 +88,8 @@ async function performAction(rawArgs) {
 		await execute(`hardhat --network ${network} etherscan-verify ${extra.join(' ')}`);
 	} else if (firstArg === 'export') {
 		const {fixedArgs} = parseArgs(args, 2, {});
-		await execute(`hardhat --network ${fixedArgs[0]} export --export ${fixedArgs[1]}`);
+
+		await execute(`hardhat --network ${fixedArgs[0]} export${fixedArgs[1] ? `--export ${fixedArgs[1]}` : ''}`);
 	} else if (firstArg === 'fork:run') {
 		const {fixedArgs, options, extra} = parseArgs(args, 2, {
 			deploy: 'boolean',

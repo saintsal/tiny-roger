@@ -30,7 +30,7 @@
 		"ethers": "^5.7.0",
 		"fs-extra": "^11.1.0",
 		"hardhat": "^2.12.7",
-		"hardhat-deploy": "^0.11.23",
+		"hardhat-deploy": "^0.11.24",
 		"hardhat-deploy-ethers": "0.4.0-next.0",
 		"hardhat-deploy-tenderly": "^0.2.0",
 		"hardhat-gas-reporter": "^1.0.9",
