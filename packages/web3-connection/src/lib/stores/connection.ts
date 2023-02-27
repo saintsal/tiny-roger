@@ -828,7 +828,12 @@ export function init(config: ConnectionConfig) {
 						if (
 							errWithCode.code === -32002 &&
 							// TODO do not make this dependent on message but need to ensure 32002 will not be triggered there for other cases
-							errWithCode.message.includes('Already processing eth_requestAccounts. Please wait.')
+							(errWithCode.message.includes(
+								'Already processing eth_requestAccounts. Please wait.'
+							) ||
+								errWithCode.message.includes(
+									`Request of type 'wallet_requestPermissions' already pending`
+								))
 						) {
 							set({
 								error: {
