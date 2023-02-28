@@ -368,7 +368,6 @@ export function init(config: ConnectionConfig) {
 			setAccount({
 				state: 'Disconnected',
 				locked: true,
-				unlocking: false,
 				address: $account.address,
 			});
 		}
