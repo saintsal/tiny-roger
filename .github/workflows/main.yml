@@ -10,16 +10,13 @@ jobs:
       - run: |
           git config user.name github-actions
           git config user.email github-actions@github.com
-          echo "fetching..."
-          git fetch
-          echo "checking out ${{ github.ref_name }}"
-          git checkout ${{ github.ref_name }}
-          echo "back to main..."
-          git checkout main-test
+          echo "fetching ${{ github.ref_name }}..."
+          git fetch origin ${{ github.ref_name }}:${{ github.ref_name }}
           echo "merging ${{ github.ref_name }}..."
           git merge -X theirs ${{ github.ref_name }}
           git status | cat
           rm web/TODO.md
+          rm -Rf .web/
           git add -A
           git commit -m "update"
           git push --force
