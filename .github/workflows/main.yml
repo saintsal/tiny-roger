@@ -2,7 +2,7 @@ name: push stripped down version to main
 on: push
 jobs:
   update:
-    if: github.ref == 'refs/heads/dev'
+    if: github.ref == 'refs/heads/public'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
