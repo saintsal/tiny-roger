@@ -951,13 +951,14 @@ export function init(config: ConnectionConfig) {
 		let timeout: NodeJS.Timeout | undefined;
 		try {
 			timeout = setTimeout(() => {
-				set({
-					initialised: true,
-					error: {
-						code: 7221,
-						message: 'Your wallet seems to not respond, please reload.',
-					},
-				});
+				// set({
+				// 	initialised: true,
+				// 	error: {
+				// 		code: 7221,
+				// 		message: 'Your wallet seems to not respond, please reload.',
+				// 	},
+				// });
+				set({ initialised: true, connecting: false });
 			}, 2000);
 			const type = fetchPreviousSelection();
 			if (type && type !== '') {
