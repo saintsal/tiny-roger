@@ -10,7 +10,9 @@ jobs:
       - run: |
           git config user.name github-actions
           git config user.email github-actions@github.com
+          echo "merging ${{ vars.GITHUB_REF_NAME }}..."
           git merge -X theirs ${{ vars.GITHUB_REF_NAME }}
+          git status | cat
           rm web/TODO.md
           git add -A
           git commit -m "update"
