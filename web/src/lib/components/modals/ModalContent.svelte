@@ -19,11 +19,17 @@
 		  }
 		| undefined = undefined;
 	export let cancelation: ModalCancellationOptions | undefined = undefined;
+
+	$: showCancelButton =
+		!(cancelation && (cancelation as any).cancelable === false) &&
+		cancelation &&
+		'button' in cancelation &&
+		cancelation.button;
 	// ----------------------------------------------------------------------------------------------
 </script>
 
 <div bind:this={element} use:focusTrap={true}>
-	{#if (cancelation && 'button' in cancelation && cancelation.button) || (settings?.type !== 'info' && (!cancelation || !('button' in cancelation)))}
+	{#if showCancelButton}
 		<button
 			on:click={() => (onResponse ? onResponse(false) : modalStore.close())}
 			class="btn btn-sm btn-circle absolute right-2 top-2">✕</button

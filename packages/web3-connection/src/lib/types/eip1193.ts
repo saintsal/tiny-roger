@@ -36,6 +36,32 @@ export type EIP1193ChainIdRequest = { method: 'eth_chainId' };
 export type EIP1193AccountsRequest = { method: 'eth_accounts' };
 export type EIP1193RequestAccountsRequest = { method: 'eth_requestAccounts' };
 
+export type ERIP1193SwitchChainRequest = {
+	method: 'wallet_switchEthereumChain';
+	params: [
+		{
+			chainId: string; // TODO `0x${string}`
+		}
+	];
+};
+export type ERIP1193AddChainRequest = {
+	method: 'wallet_addEthereumChain';
+	params: [
+		{
+			chainId: string; // TODO `0x${string}`
+			rpcUrls?: string[];
+			blockExplorerUrls?: string[];
+			chainName?: string;
+			iconUrls?: string[];
+			nativeCurrency?: {
+				name: string;
+				symbol: string;
+				decimals: number;
+			};
+		}
+	];
+};
+
 export type EIP1193Request =
 	| EIP1193TransactionRequest
 	| EIP1193LegacySignRequest
@@ -44,7 +70,9 @@ export type EIP1193Request =
 	| EIP1193PTypedSignRequest
 	| EIP1193ChainIdRequest
 	| EIP1193AccountsRequest
-	| EIP1193RequestAccountsRequest;
+	| EIP1193RequestAccountsRequest
+	| ERIP1193AddChainRequest
+	| ERIP1193SwitchChainRequest;
 
 export interface EIP1193ProviderRpcError extends Error {
 	message: string;

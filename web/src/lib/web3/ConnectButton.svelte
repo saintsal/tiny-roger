@@ -1,19 +1,11 @@
 <script>
-	import { connection, account, pendingActions } from './';
+	import { connection, account, pendingActions, network } from './';
 	import ImgBlockie from '$lib/components/ethereum/ImgBlockie.svelte';
-	import InlineInfo from '$lib/components/alert/InlineInfo.svelte';
+	import { contractsInfos } from '$lib/blockchain/contracts';
 </script>
 
 {#if $connection.state === 'Disconnected' || $account.locked}
 	{#if $account.locked}
-		{#if $account.unlocking}
-			<!-- <Alert
-			data={{ message: 'if the wallet unlock screen did not popup, please refers to its menus.' }}
-			bgBorderText="bg-warning border-warning-content text-warning-content"
-		/> -->
-			<InlineInfo>if the wallet unlock screen did not popup, please refers to its menus.</InlineInfo
-			>
-		{/if}
 		<button
 			class="m-1 btn btn-primary"
 			disabled={$account.unlocking}
@@ -36,6 +28,24 @@
 			</div> -->
 	<!-- svelte-ignore a11y-no-noninteractive-tabindex -->
 	<!-- svelte-ignore a11y-label-has-associated-control -->
+	{#if $network.notSupported}
+		<!-- svelte-ignore a11y-click-events-have-key-events -->
+		<svg
+			on:click={() => network.switchTo($contractsInfos.chainId)}
+			xmlns="http://www.w3.org/2000/svg"
+			fill="none"
+			viewBox="0 0 24 24"
+			stroke-width="1.5"
+			stroke="currentColor"
+			class="w-6 h-6"
+		>
+			<path
+				stroke-linecap="round"
+				stroke-linejoin="round"
+				d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"
+			/>
+		</svg>
+	{/if}
 	<div class="dropdown dropdown-end">
 		<div class="indicator">
 			{#if $pendingActions.list.length > 0}

@@ -38,6 +38,6 @@
 	class="m-1 btn btn-primary">Say it!</button
 >
 
-<Web3Connection {connection} {pendingActions} {account} />
+<Web3Connection {connection} {pendingActions} {account} {network} />
 
 <Modals />

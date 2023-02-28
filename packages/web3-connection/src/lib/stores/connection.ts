@@ -7,7 +7,7 @@ import { wait } from '$lib/utils/time';
 import { formatChainId } from '$lib/utils/ethereum';
 import { wrapProvider } from '$lib/provider';
 import { createPendingActionsStore } from './pending-actions';
-import { createManageablePromise, createManageablePromiseWithId } from '$lib/utils/promises';
+import { createManageablePromiseWithId } from '$lib/utils/promises';
 import { getContractInfos } from '$lib/utils/contracts';
 import { fetchPreviousSelection, recordSelection } from './localStorage';
 
@@ -43,6 +43,7 @@ export type NetworkConfigs<ContractTypes extends ContractsInfos = ContractsInfos
 export type ConnectionError = { title?: string; message: string; code: number };
 
 type BaseConnectionState = {
+	// executionRequireUserConfirmation?: boolean;
 	error?: ConnectionError;
 	toJSON?(): Partial<ConnectionState>;
 };
@@ -72,10 +73,7 @@ export type DisconnectedState = BaseConnectionState & {
 export type ConnectionState = ConnectedState | DisconnectedState;
 
 // TODO types: <ContractTypes extends ContractsInfos = ContractsInfos>
-export type NetworkState =
-	| DisconectedNetworkState
-	| ConnectedAndNotSupportedNetworkState
-	| ConnectedAndSupportedNetworkState;
+export type NetworkState = DisconectedNetworkState | ConnectedNetworkState;
 
 type BaseNetworkState = {
 	error?: ConnectionError;
@@ -86,26 +84,17 @@ export type DisconectedNetworkState = BaseNetworkState & {
 	fetchingChainId: boolean;
 	chainId?: string;
 	loading: boolean;
-	notSupported: undefined;
+	notSupported: undefined | true;
 	contracts: undefined;
 };
 
-export type ConnectedAndSupportedNetworkState = BaseNetworkState & {
+export type ConnectedNetworkState = BaseNetworkState & {
 	state: 'Connected';
 	fetchingChainId: false;
 	chainId: string;
 	loading: false;
 	notSupported: false;
 	contracts: ContractsInfos;
-};
-
-export type ConnectedAndNotSupportedNetworkState = BaseNetworkState & {
-	state: 'Connected';
-	fetchingChainId: false;
-	chainId: string;
-	loading: false;
-	notSupported: true;
-	contracts: undefined;
 };
 
 type BaseAccountState = {
@@ -136,7 +125,7 @@ export type ConnectAndExecuteCallback<T> = (state: OnConnectionExecuteState) => 
 export type OnExecuteState = {
 	connection: ConnectedState;
 	account: ConnectedAccountState;
-	network: ConnectedAndSupportedNetworkState;
+	network: ConnectedNetworkState;
 };
 export type ExecuteCallback<T> = (state: OnExecuteState) => Promise<T>;
 
@@ -269,9 +258,7 @@ export function init(config: ConnectionConfig) {
 			if (!config.networks) {
 				setNetwork({
 					state: 'Connected',
-					fetchingChainId: false,
 					chainId,
-					loading: false,
 					notSupported: false,
 					contracts: {},
 				});
@@ -279,35 +266,33 @@ export function init(config: ConnectionConfig) {
 				let networkConfigs = config.networks;
 				if (typeof networkConfigs === 'function') {
 					setNetwork({
-						state: 'Disconnected',
-						fetchingChainId: false,
 						chainId,
 						loading: true,
-						notSupported: undefined,
-						contracts: undefined,
 					});
 					networkConfigs = await networkConfigs(chainId);
-					// TODO cache
-					const contractsInfos = getContractInfos(networkConfigs, chainId);
+				}
+
+				// TODO cache
+				const contractsInfos = getContractInfos(networkConfigs, chainId);
+				if (contractsInfos) {
 					setNetwork({
 						state: 'Connected',
-						fetchingChainId: false,
 						chainId,
 						loading: false,
 						notSupported: false,
 						contracts: contractsInfos,
 					});
 				} else {
-					const contractsInfos = getContractInfos(networkConfigs, chainId);
 					setNetwork({
-						state: 'Connected',
-						fetchingChainId: false,
+						state: 'Disconnected',
 						chainId,
 						loading: false,
-						notSupported: false,
-						contracts: contractsInfos,
+						notSupported: true,
+						contracts: undefined,
 					});
 				}
+			}
+			if (!$network.notSupported) {
 				if ($account.state === 'Connected') {
 					_connect.resolve('connection+network+account', true);
 				} else {
@@ -915,36 +900,129 @@ export function init(config: ConnectionConfig) {
 		});
 	}
 
-	async function execute<T>(callback: ExecuteCallback<T>): Promise<T | undefined> {
+	async function execute<T>(
+		callback: ExecuteCallback<T>
+		//options?: { requireUserConfirmation?: boolean }
+	): Promise<T | undefined> {
+		set({ executing: true });
 		if (
 			$state.state === 'Connected' &&
 			$network.state === 'Connected' &&
 			$account.state === 'Connected'
 		) {
+			// TODO remove this or above (above should be another state : executeRequirements or we could have a separate store for execution)
+			set({ executing: true });
 			return callback({
 				connection: $state as ConnectedState,
 				account: $account as ConnectedAccountState,
-				network: $network as ConnectedAndSupportedNetworkState,
+				network: $network as ConnectedNetworkState,
+			}).finally(() => {
+				set({ executing: false });
 			});
 		}
+		// if (options?.requireUserConfirmation) {
+		// 	set({ executionRequireUserConfirmation: true });
+		// }
 		return new Promise((resolve, reject) => {
 			connect('connection+network+account')
 				.then((connected) => {
 					if (connected) {
+						// TODO remove this or above (above should be another state : executeRequirements or we could have a separate store for execution)
+						set({ executing: true });
 						callback({
 							connection: $state as unknown as ConnectedState, // this is because connected means we are in "Connected" state // TODO double check or assert
 							account: $account as ConnectedAccountState,
-							network: $network as ConnectedAndSupportedNetworkState,
-						}).then(resolve);
+							network: $network as ConnectedNetworkState,
+						})
+							.finally(() => {
+								set({ executing: false });
+							})
+							.then(resolve);
 					} else {
+						set({ executing: false });
 						resolve(undefined); // resolve silently without executing
 						// reject(new Error(`not connected`));
 					}
 				})
 				.catch((err) => {
+					set({ executing: false });
 					reject(err);
 				});
 		});
+	}
+
+	async function switchTo(
+		chainId: string,
+		config?: {
+			rpcUrls?: string[];
+			blockExplorerUrls?: string[];
+			chainName?: string;
+			iconUrls?: string[];
+			nativeCurrency?: {
+				name: string;
+				symbol: string;
+				decimals: number;
+			};
+		}
+	) {
+		if (!$state.provider) {
+			// TODO? autoConnect ?
+			throw new Error(`no provider setup`);
+		}
+		try {
+			// attempt to switch...
+			await $state.provider.request({
+				method: 'wallet_switchEthereumChain',
+				params: [
+					{
+						chainId: '0x' + parseInt(chainId).toString(16),
+					},
+				],
+			});
+		} catch (err) {
+			if ((err as any).code === 4902) {
+				if (config && config.rpcUrls && config.rpcUrls.length > 0) {
+					try {
+						await $state.provider.request({
+							method: 'wallet_addEthereumChain',
+							params: [
+								{
+									chainId: '0x' + parseInt(chainId).toString(16),
+									rpcUrls: config.rpcUrls,
+									chainName: config.chainName,
+									blockExplorerUrls: config.blockExplorerUrls,
+									iconUrls: config.iconUrls,
+									nativeCurrency: config.nativeCurrency,
+								},
+							],
+						});
+					} catch (err) {
+						if ((err as any).code !== 4001) {
+							set({
+								error: err as any, // TODO
+							});
+						} else {
+							return;
+						}
+					}
+				} else {
+					set({
+						error: {
+							code: 1, // TODO CHAIN_NOT_AVAILABLE_ON_WALLET,
+							message: 'Chain not available on your wallet',
+						},
+					});
+				}
+			} else {
+				if ((err as any).code !== 4001) {
+					set({
+						error: err as any, // TODO
+					});
+				} else {
+					return;
+				}
+			}
+		}
 	}
 
 	async function autoStart() {
@@ -996,6 +1074,10 @@ export function init(config: ConnectionConfig) {
 			acknowledgeError() {
 				set({ error: undefined, unlocking: false } as any); // TODO Remove any
 			},
+			// confirmExecution() {
+			// 	set({ executionRequireUserConfirmation: false });
+			// },
+			// TODO cancelExecution
 			builtin,
 			connect,
 			select,
@@ -1006,6 +1088,7 @@ export function init(config: ConnectionConfig) {
 		},
 		network: {
 			...readableNetwork,
+			switchTo,
 		},
 		account: {
 			...readableAccount,
