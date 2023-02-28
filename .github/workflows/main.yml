@@ -5,10 +5,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+        with:
+          ref: main-test
       - run: |
           git config user.name github-actions
           git config user.email github-actions@github.com
-          git checkout main-test
           git merge -X theirs ${{ vars.GITHUB_REF_NAME }}
           rm web/TODO.md
           git add -A
