@@ -9,5 +9,5 @@ jobs:
           git config user.email github-actions@github.com
           rm web/TODO.md
           git add -A
-          git commit -m ""
+          git commit -m "update"
           git push origin main-test --force
