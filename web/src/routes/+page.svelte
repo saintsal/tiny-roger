@@ -47,7 +47,7 @@
 		<p class="m-6 !text-xl">Production-Ready Template To Build Decentralised Applications</p>
 		<div class="max-w-md mx-auto pt-1 mt-5 space-y-3 md:m-8 md:space-y-5">
 			<div class="space-y-5 sm:flex sm:justify-center sm:space-y-0 sm:space-x-3">
-				<a class="btn btn-primary btn-wide" href="/demo/" aria-label="Try the Demo!">Demo</a>
+				<a class="btn btn-primary btn-wide" href={url('/demo/')} aria-label="Try the Demo!">Demo</a>
 				<a
 					class="btn btn-secondary btn-wide"
 					target="_blank"

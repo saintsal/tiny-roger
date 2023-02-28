@@ -13,7 +13,7 @@ export function url(p: string) {
 }
 
 export function isSameURL(a: string, b: string): boolean {
-	return a === pathname(b);
+	return a === b || a === pathname(b);
 }
 
 export function isParentURL(a: string, b: string): boolean {

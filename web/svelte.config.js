@@ -1,5 +1,5 @@
 import preprocess from 'svelte-preprocess';
-import adapter from 'sveltejs-adapter-ipfs';
+import adapter from '@sveltejs/adapter-static';
 import { vitePreprocess } from '@sveltejs/kit/vite';
 import { execSync } from 'child_process';
 
@@ -15,13 +15,7 @@ const config = {
 	],
 
 	kit: {
-		adapter: adapter({
-			pages: 'build',
-			strict: true,
-			// works with sveltekit master
-			skipSingletonsAndPathsFiles: true,
-			skipReplacementInIndexHTML: true,
-		}),
+		adapter: adapter(),
 		version: {
 			name: VERSION,
 		},
@@ -30,6 +24,9 @@ const config = {
 		},
 		serviceWorker: {
 			register: false,
+		},
+		paths: {
+			relative: true,
 		},
 	},
 };

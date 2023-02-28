@@ -39,10 +39,10 @@
 
 	<!-- minimal -->
 	<!-- use SVG, if need PNG, adapt accordingly -->
-	<link rel="icon" href="/pwa/favicon.svg" type="image/svg+xml" />
-	<link rel="icon" href="/pwa/favicon.ico" sizes="any" /><!-- 32×32 -->
-	<link rel="apple-touch-icon" href="/pwa/apple-touch-icon.png" /><!-- 180×180 -->
-	<link rel="manifest" href="/pwa/manifest.webmanifest" />
+	<link rel="icon" href={url('/pwa/favicon.svg')} type="image/svg+xml" />
+	<link rel="icon" href={url('/pwa/favicon.ico')} sizes="any" /><!-- 32×32 -->
+	<link rel="apple-touch-icon" href={url('/pwa/apple-touch-icon.png')} /><!-- 180×180 -->
+	<link rel="manifest" href={url('/pwa/manifest.webmanifest')} />
 
 	<!-- extra info -->
 	<meta name="theme-color" content={themeColor} />
