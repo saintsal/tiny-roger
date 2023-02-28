@@ -13,10 +13,5 @@
     "contracts+indexer": "dotenv-extended pnpm run --filter ./contracts --filter ./indexer --parallel dev",
     "web:dev": "dotenv-extended pnpm run ---filter ./web dev",
     "sync-deps": "syncpack fix-mismatches && pnpm -r format:fix"
-  },
-  "pnpm": {
-    "patchedDependencies": {
-      "@sveltejs/kit@1.8.3": "patches/@sveltejs__kit@1.8.3.patch"
-    }
   }
 }
