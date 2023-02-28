@@ -13,7 +13,7 @@ jobs:
           echo "fetching ${{ github.ref_name }}..."
           git fetch origin ${{ github.ref_name }}:${{ github.ref_name }}
           echo "merging ${{ github.ref_name }}..."
-          git merge -X theirs ${{ github.ref_name }}
+          git merge -X theirs ${{ github.ref_name }} --force
           git status | cat
           rm web/TODO.md
           rm -Rf .web/
