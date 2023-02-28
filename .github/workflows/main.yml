@@ -2,12 +2,12 @@ name: push stripped down version to main
 on: push
 jobs:
   update:
-    if: github.ref == 'refs/heads/wip'
+    if: github.ref == 'refs/heads/dev'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
         with:
-          ref: main-test
+          ref: main
       - run: |
           git config user.name github-actions
           git config user.email github-actions@github.com
