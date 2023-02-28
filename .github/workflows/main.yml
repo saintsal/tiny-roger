@@ -1,3 +1,4 @@
+name: push stripped down version to main
 on: push
 jobs:
   build:
@@ -7,7 +8,9 @@ jobs:
       - run: |
           git config user.name github-actions
           git config user.email github-actions@github.com
+          git checkout main
+          git merge -X theirs ${{ GITHUB_REF_NAME }}
           rm web/TODO.md
           git add -A
           git commit -m "update"
-          git push origin main-test --force
+          git push --force
