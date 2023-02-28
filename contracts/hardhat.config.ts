@@ -2,6 +2,7 @@ import 'dotenv/config';
 import {HardhatUserConfig} from 'hardhat/types';
 import 'hardhat-deploy';
 import '@nomiclabs/hardhat-ethers';
+import 'hardhat-deploy-ethers';
 import 'hardhat-gas-reporter';
 import '@typechain/hardhat';
 import 'solidity-coverage';
@@ -12,7 +13,7 @@ const config: HardhatUserConfig = {
 	solidity: {
 		compilers: [
 			{
-				version: '0.8.13',
+				version: '0.8.17',
 				settings: {
 					optimizer: {
 						enabled: true,

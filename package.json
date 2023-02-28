@@ -1,19 +1,22 @@
 {
-  "name": "tiny-roger",
+  "name": "jolly-roger",
   "version": "0.1.0",
-  "description": "tiny-roger",
-  "pnpm": {
-    "patchedDependencies": {
-      "chai-ethers@0.0.1": "patches/chai-ethers@0.0.1.patch"
-    }
-  },
+  "description": "Template to develop fully decentralised app and games",
+  "private": true,
   "devDependencies": {
     "dotenv-extended": "^2.9.0",
-    "syncpack": "^8.2.4"
+    "syncpack": "^9.8.4"
   },
   "scripts": {
     "test": "dotenv-extended env",
-    "dev": "dotenv-extended pnpm --parallel dev",
+    "build": "dotenv-extended pnpm run --filter ./contracts export goerli && pnpm run --filter web3-connection build && pnpm run --filter ./indexer build && pnpm run --filter ./web build",
+    "contracts+indexer": "dotenv-extended pnpm run --filter ./contracts --filter ./indexer --parallel dev",
+    "web:dev": "dotenv-extended pnpm run ---filter ./web dev",
     "sync-deps": "syncpack fix-mismatches && pnpm -r format:fix"
+  },
+  "pnpm": {
+    "patchedDependencies": {
+      "@sveltejs/kit@1.8.3": "patches/@sveltejs__kit@1.8.3.patch"
+    }
   }
 }
