@@ -14,6 +14,8 @@ jobs:
           git checkout ${{ github.ref_name }}
           echo "fetching..."
           git fetch
+          echo "back to main..."
+          git checkout main-test
           echo "merging ${{ github.ref_name }}..."
           git merge -X theirs ${{ github.ref_name }}
           git status | cat
